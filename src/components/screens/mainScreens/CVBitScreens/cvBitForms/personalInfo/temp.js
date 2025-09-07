@@ -1,0 +1,15 @@
+const personalInfoToEdit = {
+  __v: 0,
+  _id: '66979aa77ec14d62e107e494',
+  _user: '667aaf566460172ebe77f65f',
+  dateOfBirth: '2000-07-17T08:58:00.000Z',
+  driversLicense: true,
+  fullName: 'Nico Rapelas',
+  gender: 'male',
+  idNumber: '8106075147852',
+  lastUpdate: '2024-07-17T10:19:19.197Z',
+  licenseCode: 'B',
+  nationality: null,
+  ppNumber: null,
+  saCitizen: true,
+}

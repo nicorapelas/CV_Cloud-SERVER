@@ -1,0 +1,49 @@
+{
+  "expo": {
+    "name": "cv-cloud-mobile-rebuild",
+    "slug": "cv-cloud-mobile-rebuild",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#232936",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#232936"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#232936"
+      },
+      "permissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.INTERNET",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-file-system",
+      "expo-camera",
+      "expo-audio"
+    ],
+    "newArchEnabled": true,
+    "sdkVersion": "53.0.0",
+    "extra": {
+      "eas": {
+        "projectId": "db713e3a-0eae-4c00-b458-aac92590a18e"
+      }
+    },
+    "owner": "nicorapelas"
+  }
+}
