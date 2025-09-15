@@ -32,13 +32,9 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-      "expo-file-system",
-      "expo-camera",
-      "expo-audio"
-    ],
+    "plugins": ["expo-file-system", "expo-camera", "expo-audio"],
     "newArchEnabled": true,
-    "sdkVersion": "53.0.0",
+    "sdkVersion": "54.0.0",
     "extra": {
       "eas": {
         "projectId": "db713e3a-0eae-4c00-b458-aac92590a18e"

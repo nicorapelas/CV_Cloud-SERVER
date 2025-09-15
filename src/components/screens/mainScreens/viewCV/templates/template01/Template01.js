@@ -35,7 +35,7 @@ const Template01 = ({
   employHistorySample,
   experiences,
   experienceSample,
-  secondEdus,
+  secondEdu,
   secondEduSample,
   tertEdus,
   tertEduSample,
@@ -59,7 +59,7 @@ const Template01 = ({
       : personalSummary?.[0],
     employHistorys: showSample ? employHistorySample : employHistorys,
     experiences: showSample ? experienceSample : experiences,
-    secondEdus: showSample ? secondEduSample : secondEdus,
+    secondEdu: showSample ? secondEduSample : secondEdu,
     tertEdus: showSample ? tertEduSample : tertEdus,
   }
 
@@ -356,7 +356,7 @@ const Template01 = ({
                   )}
 
                   {/* Education */}
-                  {(data.secondEdus?.length > 0 ||
+                  {(data.secondEdu?.length > 0 ||
                     data.tertEdus?.length > 0) && (
                     <View style={currentStyles.section}>
                       <View style={currentStyles.sectionHeader}>
@@ -373,7 +373,7 @@ const Template01 = ({
                           >
                             <View style={currentStyles.itemHeader}>
                               <Text style={currentStyles.itemTitle}>
-                                {edu.qualification}
+                                {edu.schoolName}
                               </Text>
                               <Text style={currentStyles.itemDate}>
                                 {formatDate(edu.startDate)} -{' '}
@@ -383,7 +383,7 @@ const Template01 = ({
                               </Text>
                             </View>
                             <Text style={currentStyles.itemSubtitle}>
-                              {edu.instituteName || edu.institution}
+                              {edu.schoolName}
                             </Text>
                             {edu.subjects && (
                               <Text style={currentStyles.itemDescription}>
@@ -392,14 +392,14 @@ const Template01 = ({
                             )}
                           </View>
                         ))}
-                        {data.secondEdus?.map((edu, index) => (
+                        {data.secondEdu?.map((edu, index) => (
                           <View
                             key={`second-${index}`}
                             style={currentStyles.item}
                           >
                             <View style={currentStyles.itemHeader}>
                               <Text style={currentStyles.itemTitle}>
-                                {edu.qualification}
+                                {edu.schoolName}
                               </Text>
                               <Text style={currentStyles.itemDate}>
                                 {formatDate(edu.startDate)} -{' '}
@@ -409,7 +409,7 @@ const Template01 = ({
                               </Text>
                             </View>
                             <Text style={currentStyles.itemSubtitle}>
-                              {edu.instituteName || edu.institution}
+                              {edu.schoolName}
                             </Text>
                             {edu.subjects && (
                               <Text style={currentStyles.itemDescription}>

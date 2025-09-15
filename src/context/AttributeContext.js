@@ -18,13 +18,28 @@ const AttributeReducer = (state, action) => {
     case 'FETCH_ALL':
       return { ...state, attributes: action.payload, loading: false }
     case 'CREATE':
-      return { ...state, attributes: action.payload, attributeStatusInitFetchDone: false, loading: false }
+      return {
+        ...state,
+        attributes: action.payload,
+        attributeStatusInitFetchDone: false,
+        loading: false,
+      }
     case 'SET_ATTRIBUTE_TO_EDIT':
       return { ...state, attributeToEdit: action.payload }
     case 'EDIT':
-      return { ...state, attributes: action.payload, attributeStatusInitFetchDone: false, loading: false }
+      return {
+        ...state,
+        attributes: action.payload,
+        attributeStatusInitFetchDone: false,
+        loading: false,
+      }
     case 'DELETE':
-      return { ...state, attributes: action.payload, attributeStatusInitFetchDone: false, loading: false }
+      return {
+        ...state,
+        attributes: action.payload,
+        attributeStatusInitFetchDone: false,
+        loading: false,
+      }
     case 'SET_ATTRIBUTE_STATUS_INIT_FETCH_DONE':
       return { ...state, attributeStatusInitFetchDone: action.payload }
     default:
@@ -113,13 +128,18 @@ const deleteAttribute = (dispatch) => async (id) => {
   }
 }
 
-const clearAttributeErrors = (dispatch) =>  () => {
+const clearAttributeErrors = (dispatch) => () => {
   dispatch({ type: 'CLEAR_ERRORS', payload: null })
   return
 }
 
+const addError = (dispatch) => (error) => {
+  dispatch({ type: 'ADD_ERROR', payload: error })
+  return
+}
+
 const setAttributeStatusInitFetchDone = (dispatch) => (value) => {
-  dispatch({ type: 'SET_ATTRIBUTE_STATUS_INIT_FETCH_DONE', payload: value})
+  dispatch({ type: 'SET_ATTRIBUTE_STATUS_INIT_FETCH_DONE', payload: value })
 }
 
 export const { Context, Provider } = createDataContext(
@@ -132,6 +152,7 @@ export const { Context, Provider } = createDataContext(
     editAttribute,
     setAttributeToEdit,
     deleteAttribute,
+    addError,
     clearAttributeErrors,
     setAttributeStatusInitFetchDone,
   },

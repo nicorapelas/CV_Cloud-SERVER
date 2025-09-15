@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import AttributeEditForm from '../cvBitForms/AttributeInterestPersonalSummaryEditForm'
+import AttributeEditForm from '../cvBitForms/attribute/AttributeEditForm'
 import LoaderFullScreen from '../../../../common/LoaderFullScreen'
 import { Context as AttributeContext } from '../../../../../context/AttributeContext'
 
@@ -10,7 +10,7 @@ const AttributeEditScreen = () => {
 
   const renderContent = () => {
     if (loading || loading === null) return <LoaderFullScreen />
-    return <AttributeEditForm bit="attribute" />
+    return <AttributeEditForm />
   }
 
   return renderContent()

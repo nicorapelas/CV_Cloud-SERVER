@@ -7,6 +7,8 @@ import {
   Platform,
   Image,
   Text,
+  Modal,
+  FlatList,
 } from 'react-native'
 import { AntDesign } from '@expo/vector-icons'
 
@@ -16,6 +18,15 @@ import logo from '../../../../../assets/images/logo-h79.png'
 // Import templates
 import CurrentTemplate from './templates/current/CurrentTemplate'
 import Template01 from './templates/template01/Template01'
+import Template02 from './templates/template02/Template02'
+import Template03 from './templates/template03/Template03'
+import Template04 from './templates/template04/Template04'
+import Template05 from './templates/template05/Template05'
+import Template06 from './templates/template06/Template06'
+import Template07 from './templates/template07/Template07'
+import Template08 from './templates/template08/Template08'
+import Template09 from './templates/template09/Template09'
+import Template10 from './templates/template10/Template10'
 
 import { Context as AttributeContext } from '../../../../context/AttributeContext'
 import { Context as ContactInfoContext } from '../../../../context/ContactInfoContext'
@@ -36,6 +47,34 @@ const ViewCVScreen = () => {
   const [showSample, setShowSample] = useState(false)
   const [showSampleButton, setShowSampleButton] = useState(true)
   const [selectedTemplate, setSelectedTemplate] = useState('template01') // Template01 as default
+  const [showTemplateDropdown, setShowTemplateDropdown] = useState(false)
+
+  // Template options for dropdown
+  const templateOptions = [
+    { value: 'template01', label: 'Modern' },
+    { value: 'template02', label: 'Clean' },
+    { value: 'template03', label: 'Creative' },
+    { value: 'template04', label: 'Dark' },
+    { value: 'template05', label: 'Tech' },
+    { value: 'template06', label: 'Newspaper' },
+    { value: 'template07', label: 'Finance' },
+    { value: 'template08', label: 'Menu' },
+    { value: 'template09', label: 'Industrial' },
+    { value: 'template10', label: 'Agriculture' },
+  ]
+
+  // Helper functions for dropdown
+  const getSelectedTemplateLabel = () => {
+    const selected = templateOptions.find(
+      (option) => option.value === selectedTemplate
+    )
+    return selected ? selected.label : 'Modern'
+  }
+
+  const handleTemplateSelect = (templateValue) => {
+    setSelectedTemplate(templateValue)
+    setShowTemplateDropdown(false)
+  }
 
   const {
     state: { loading: loadingAttribute, attributes, attributeSample },
@@ -105,13 +144,14 @@ const ViewCVScreen = () => {
   } = useContext(ReferenceContext)
 
   const {
-    state: { loading: loadingSecondEdu, secondEdus, secondEduSample },
+    state: { loading: loadingSecondEdu, secondEdu, secondEduSample },
     fetchSecondEduSample,
   } = useContext(SecondEduContext)
 
   const {
     state: { loading: loadingSkill, skills, skillSample },
     fetchSkillSample,
+    fetchSkills,
   } = useContext(SkillContext)
 
   const {
@@ -139,8 +179,12 @@ const ViewCVScreen = () => {
     fetchReferenceSample()
     fetchSecondEduSample()
     fetchSkillSample()
+    fetchSkills()
     fetchTertEduSample()
   }, [])
+
+  console.log('secondEdu:', secondEdu)
+  console.log('skills:', skills)
 
   const userRedirect = () => {
     if (personalInfo === null || contactInfo === null) return null
@@ -183,44 +227,64 @@ const ViewCVScreen = () => {
           </View>
         </View>
 
-        {/* Bottom Row: Template Selector */}
+        {/* Bottom Row: Template Selector Dropdown */}
         <View style={styles.templateSelector}>
           <Text style={styles.templateLabel}>Template:</Text>
           <TouchableOpacity
-            style={[
-              styles.templateButton,
-              selectedTemplate === 'template01' && styles.templateButtonActive,
-            ]}
-            onPress={() => setSelectedTemplate('template01')}
+            style={styles.dropdownButton}
+            onPress={() => setShowTemplateDropdown(true)}
           >
-            <Text
-              style={[
-                styles.templateButtonText,
-                selectedTemplate === 'template01' &&
-                  styles.templateButtonTextActive,
-              ]}
-            >
-              Modern
+            <Text style={styles.dropdownButtonText}>
+              {getSelectedTemplateLabel()}
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.templateButton,
-              selectedTemplate === 'current' && styles.templateButtonActive,
-            ]}
-            onPress={() => setSelectedTemplate('current')}
-          >
-            <Text
-              style={[
-                styles.templateButtonText,
-                selectedTemplate === 'current' &&
-                  styles.templateButtonTextActive,
-              ]}
-            >
-              Classic
-            </Text>
+            <AntDesign name="down" size={12} color="#fff" />
           </TouchableOpacity>
         </View>
+
+        {/* Template Dropdown Modal */}
+        <Modal
+          visible={showTemplateDropdown}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setShowTemplateDropdown(false)}
+        >
+          <TouchableOpacity
+            style={styles.modalOverlay}
+            activeOpacity={1}
+            onPress={() => setShowTemplateDropdown(false)}
+          >
+            <View style={styles.dropdownContainer}>
+              <FlatList
+                data={templateOptions}
+                keyExtractor={(item) => item.value}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={[
+                      styles.dropdownItem,
+                      selectedTemplate === item.value &&
+                        styles.dropdownItemActive,
+                    ]}
+                    onPress={() => handleTemplateSelect(item.value)}
+                  >
+                    <Text
+                      style={[
+                        styles.dropdownItemText,
+                        selectedTemplate === item.value &&
+                          styles.dropdownItemTextActive,
+                      ]}
+                    >
+                      {item.label}
+                    </Text>
+                    {selectedTemplate === item.value && (
+                      <AntDesign name="check" size={16} color="#007AFF" />
+                    )}
+                  </TouchableOpacity>
+                )}
+                showsVerticalScrollIndicator={false}
+              />
+            </View>
+          </TouchableOpacity>
+        </Modal>
       </View>
     )
   }
@@ -253,7 +317,7 @@ const ViewCVScreen = () => {
       employHistorySample,
       experiences,
       experienceSample,
-      secondEdus,
+      secondEdu,
       secondEduSample,
       tertEdus,
       tertEduSample,
@@ -266,6 +330,24 @@ const ViewCVScreen = () => {
     switch (selectedTemplate) {
       case 'template01':
         return <Template01 {...templateProps} />
+      case 'template02':
+        return <Template02 {...templateProps} />
+      case 'template03':
+        return <Template03 {...templateProps} />
+      case 'template04':
+        return <Template04 {...templateProps} />
+      case 'template05':
+        return <Template05 {...templateProps} />
+      case 'template06':
+        return <Template06 {...templateProps} />
+      case 'template07':
+        return <Template07 {...templateProps} />
+      case 'template08':
+        return <Template08 {...templateProps} />
+      case 'template09':
+        return <Template09 {...templateProps} />
+      case 'template10':
+        return <Template10 {...templateProps} />
       case 'current':
         return <CurrentTemplate {...templateProps} />
       default:
@@ -419,7 +501,7 @@ const styles = StyleSheet.create({
   bed: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: -55,
+    marginTop: -40,
   },
   logo: {
     width: 150,
@@ -430,7 +512,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    gap: 12,
     paddingVertical: 8,
     paddingHorizontal: 10,
   },
@@ -439,26 +521,65 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   },
-  templateButton: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
+  dropdownButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 6,
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
+    minWidth: 100,
   },
-  templateButtonActive: {
-    backgroundColor: '#278ACD',
-    borderColor: '#278ACD',
-  },
-  templateButtonText: {
+  dropdownButtonText: {
     color: '#fff',
-    fontSize: 10,
+    fontSize: 12,
+    fontWeight: '500',
+    marginRight: 8,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dropdownContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    marginHorizontal: 20,
+    maxHeight: 300,
+    minWidth: 200,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  dropdownItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  dropdownItemActive: {
+    backgroundColor: '#f8f9fa',
+  },
+  dropdownItemText: {
+    fontSize: 14,
+    color: '#333',
     fontWeight: '500',
   },
-  templateButtonTextActive: {
-    color: '#fff',
-    fontWeight: 'bold',
+  dropdownItemTextActive: {
+    color: '#007AFF',
+    fontWeight: '600',
   },
   zoomButtonsContainer: {
     flexDirection: 'column',

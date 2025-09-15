@@ -61,12 +61,7 @@ const AttributeScreen = () => {
                 <View style={styles.buttonBed}>
                   <TouchableOpacity
                     style={styles.editButtonBed}
-                    onPress={() =>
-                      handlePressEdit({
-                        id: item._id,
-                        attribute: item.attribute,
-                      })
-                    }
+                    onPress={() => handlePressEdit(item)}
                   >
                     <MaterialCommunityIcons
                       style={styles.actionButton}
