@@ -4,6 +4,7 @@ import { View, StyleSheet, Animated, Dimensions, Platform } from 'react-native'
 import { Context as NavContext } from './src/context/NavContext'
 import { Context as AuthContext } from './src/context/AuthContext'
 import { Context as UniversalContext } from './src/context/UniversalContext'
+import { Context as AdvertisementContext } from './src/context/AdvertisementContext'
 
 import RegisterOrLoginScreen from './src/components/screens/authScreens/RegisterOrLoginScreen'
 import RegisterEmailScreen from './src/components/screens/authScreens/RegisterEmailScreen'
@@ -26,6 +27,8 @@ const AppScreens = () => {
 
   const { setUserPlatformOS } = useContext(UniversalContext)
 
+  const { fetchSystemSettings } = useContext(AdvertisementContext)
+
   const [currentScreen, setCurrentScreen] = useState(screenSelected)
   const [nextScreen, setNextScreen] = useState(null)
   const [slideDirection, setSlideDirection] = useState('left')
@@ -43,6 +46,13 @@ const AppScreens = () => {
       setFetchUserCount(fetchUserCount + 1)
     }
   }, [token, fetchUserCount, user])
+
+  // Fetch system settings immediately when user is loaded
+  useEffect(() => {
+    if (user) {
+      fetchSystemSettings()
+    }
+  }, [user])
 
   useEffect(() => {
     if (screenSelected !== currentScreen) {

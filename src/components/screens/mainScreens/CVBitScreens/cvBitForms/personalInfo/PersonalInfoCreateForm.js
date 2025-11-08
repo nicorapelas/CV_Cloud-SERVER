@@ -23,6 +23,11 @@ import FormCancelButton from '../../../../../common/FormCancelButton'
 import { Context as PersonalInfoContext } from '../../../../../../context/PersonalInfoContext'
 import { Context as UniversalContext } from '../../../../../../context/UniversalContext'
 import { Context as NavContext } from '../../../../../../context/NavContext'
+import {
+  COUNTRIES,
+  getCountryConfig,
+  detectUserCountry,
+} from '../../../../../../utils/countryConfig'
 
 const PersonalInfoCreateForm = ({
   incomingDateOfBirth,
@@ -40,6 +45,7 @@ const PersonalInfoCreateForm = ({
   const [dateOfBirth, setDateOfBirth] = useState(new Date())
 
   const [gender, setGender] = useState(incomingGender ? incomingGender : null)
+  const [country, setCountry] = useState(detectUserCountry())
   const [saCitizen, setSaCitizen] = useState(true)
 
   const [idNumber, setIdNumber] = useState(
@@ -53,6 +59,7 @@ const PersonalInfoCreateForm = ({
   )
 
   const [fullNameInputShow, setFullNameInputShow] = useState(true)
+  const [countryInputShow, setCountryInputShow] = useState(false)
   const [idInputShow, setIdInputShow] = useState(false)
   const [licenseInputShow, setLicenseInputShow] = useState(false)
   const [dateOfBirthInputShow, setDateOfBirthInputShow] = useState(false)
@@ -61,6 +68,9 @@ const PersonalInfoCreateForm = ({
   const [datePickerOpen, setDatePickerOpen] = useState(false)
   const [dummyDateShow, setDummyDateShow] = useState(false)
   const [saveButtonShow, setSaveButtonShow] = useState(false)
+
+  // Get country configuration based on selected country
+  const countryConfig = getCountryConfig(country)
 
   const {
     state: { optionPickerShow, optionsModalSelectedOption },
@@ -88,7 +98,20 @@ const PersonalInfoCreateForm = ({
   }, [])
 
   useEffect(() => {
-    if (optionsModalSelectedOption) setGender(optionsModalSelectedOption)
+    if (optionsModalSelectedOption) {
+      // Handle country selection (format: "🇿🇦 South Africa")
+      if (optionPickerShow === 'country') {
+        const selectedCountry = COUNTRIES.find((c) =>
+          optionsModalSelectedOption.includes(c.name)
+        )
+        if (selectedCountry) {
+          setCountry(selectedCountry.code)
+        }
+      } else {
+        // Handle gender selection
+        setGender(optionsModalSelectedOption)
+      }
+    }
   }, [optionsModalSelectedOption])
 
   useEffect(() => {
@@ -249,9 +272,9 @@ const PersonalInfoCreateForm = ({
               }
               onPress={() => setDatePickerOpen(false)}
             >
-              <AntDesign
+              <MaterialIcons
                 style={styles.pickerBackButtonIcon}
-                name="checkcircleo"
+                name="check-circle"
               />
               <Text style={styles.pickerBackButtonText}>done</Text>
             </TouchableOpacity>
@@ -321,7 +344,7 @@ const PersonalInfoCreateForm = ({
       return
     } else {
       setFullNameInputShow(false)
-      setDateOfBirthInputShow(true)
+      setCountryInputShow(true)
       return
     }
   }
@@ -373,28 +396,100 @@ const PersonalInfoCreateForm = ({
     )
   }
 
+  const renderCountrySelector = () => {
+    if (!countryInputShow) return null
+    return (
+      <>
+        <View>
+          <Text style={styles.inputHeader}>Country</Text>
+          <Text style={styles.helperText}>
+            {country === 'ZA'
+              ? '🇿🇦 South Africa - Full features available'
+              : `${
+                  COUNTRIES.find((c) => c.code === country)?.flag || '🌍'
+                } International`}
+          </Text>
+          <TouchableOpacity
+            style={styles.pickerButton}
+            onPress={() => {
+              setOptionPickerShow('country')
+              toggleHideNavLinks(false)
+            }}
+          >
+            <Text style={styles.pickerButtonText}>
+              {COUNTRIES.find((c) => c.code === country)?.name ||
+                'Select Country'}
+            </Text>
+            <AntDesign name="down" size={16} color="#278acd" />
+          </TouchableOpacity>
+          <OptionsModal
+            bit="country"
+            optionsArray={COUNTRIES.map((c) => `${c.flag} ${c.name}`)}
+            selected={COUNTRIES.find((c) => c.code === country)?.name}
+          />
+        </View>
+        <View style={styles.nextBackButtonsBed}>
+          <TouchableOpacity
+            style={styles.addButtonContainer}
+            onPress={() => {
+              setCountryInputShow(false)
+              setFullNameInputShow(true)
+            }}
+          >
+            <Ionicons
+              name="arrow-back-circle-sharp"
+              style={styles.addButtonIcon}
+            />
+            <Text style={styles.addButtonText}>back</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.addButtonContainer}
+            onPress={() => {
+              setCountryInputShow(false)
+              setDateOfBirthInputShow(true)
+            }}
+          >
+            <Text style={styles.addButtonText}>next</Text>
+            <Ionicons
+              name="arrow-forward-circle-sharp"
+              style={styles.nextButtonIcon}
+            />
+          </TouchableOpacity>
+        </View>
+      </>
+    )
+  }
+
   const renderSaCitizenFields = () => {
     if (!idInputShow) return null
     return (
       <>
-        <View style={styles.switchFieldBed}>
-          <Text style={styles.switchFieldText}>South African citizen?</Text>
-          <Switch
-            trackColor={{ false: '#ffff', true: '#81b0ff' }}
-            thumbColor={saCitizen ? '#f5dd4b' : '#f4f3f4'}
-            onValueChange={toggleSaCitizen}
-            value={saCitizen}
-          />
-          <Text style={styles.switchFieldText}>{saCitizen ? 'yes' : 'no'}</Text>
-        </View>
-        {saCitizen ? (
+        {/* Show SA Citizen toggle only for non-ZA countries */}
+        {country !== 'ZA' && (
+          <View style={styles.switchFieldBed}>
+            <Text style={styles.switchFieldText}>South African citizen?</Text>
+            <Switch
+              trackColor={{ false: '#ffff', true: '#81b0ff' }}
+              thumbColor={saCitizen ? '#f5dd4b' : '#f4f3f4'}
+              onValueChange={toggleSaCitizen}
+              value={saCitizen}
+            />
+            <Text style={styles.switchFieldText}>
+              {saCitizen ? 'yes' : 'no'}
+            </Text>
+          </View>
+        )}
+
+        {/* Show ID field if ZA country OR if SA citizen */}
+        {country === 'ZA' || saCitizen ? (
           <View>
-            <Text style={styles.inputHeader}>ID Number</Text>
+            <Text style={styles.inputHeader}>{countryConfig.idLabel}</Text>
+            <Text style={styles.helperText}>{countryConfig.idHelperText}</Text>
             <TextInput
               style={styles.input}
-              maxLength={13}
+              maxLength={country === 'ZA' ? 13 : 20}
               textAlign="center"
-              placeholder="ID number"
+              placeholder={countryConfig.idPlaceholder}
               value={idNumber}
               onChangeText={setIdNumber}
               autoCorrect={false}
@@ -480,6 +575,7 @@ const PersonalInfoCreateForm = ({
         dateOfBirth.getFullYear() === thisDate.getFullYear()
           ? null
           : dateOfBirth,
+      country,
       gender,
       saCitizen,
       nationality,
@@ -577,6 +673,7 @@ const PersonalInfoCreateForm = ({
     return (
       <>
         {renderNameField()}
+        {renderCountrySelector()}
         {renderDatePicker()}
         {renderGenderPicker()}
         {renderSaCitizenFields()}
@@ -861,6 +958,30 @@ const styles = StyleSheet.create({
   },
   previewText: {
     marginBottom: 5,
+  },
+  helperText: {
+    color: '#7ac6fa',
+    fontSize: 12,
+    width: '85%',
+    alignSelf: 'center',
+    marginBottom: 5,
+    marginTop: -3,
+  },
+  pickerButton: {
+    backgroundColor: '#ffffff',
+    alignSelf: 'center',
+    height: 50,
+    width: '85%',
+    borderRadius: 7,
+    margin: 5,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+  },
+  pickerButtonText: {
+    fontSize: 16,
+    color: '#000',
   },
 })
 

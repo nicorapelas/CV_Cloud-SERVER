@@ -8,7 +8,7 @@ import {
   Modal,
 } from 'react-native'
 import AppLink from 'react-native-app-link'
-import { Octicons, AntDesign } from '@expo/vector-icons'
+import { Octicons, AntDesign, MaterialIcons } from '@expo/vector-icons'
 
 import { Context as UniversalContext } from '../../../context/UniversalContext'
 import { Context as FirstImpressionContext } from '../../../context/FirstImpressionContext'
@@ -105,7 +105,7 @@ const InstructionModal = ({ bit }) => {
             style={styles.demoButton}
             onPress={() => setVideoDemoShow(true)}
           >
-            <AntDesign name="play" style={styles.playIcons} />
+            <MaterialIcons name="play-circle" style={styles.playIcons} />
             <Text style={styles.demoButtonText}>Play Demo</Text>
           </TouchableOpacity>
         </View>
@@ -126,14 +126,14 @@ const InstructionModal = ({ bit }) => {
           <View style={styles.messageBed}>
             <ScrollView>
               <View style={styles.headingBed}>
-                <AntDesign name="infocirlce" style={styles.headingIcon} />
+                <MaterialIcons name="info" style={styles.headingIcon} />
               </View>
               <View style={styles.hintListBed}>{renderInstruction()}</View>
               <TouchableOpacity
                 style={styles.backButton}
                 onPress={() => toggleInstructionModal(false)}
               >
-                <AntDesign style={styles.backButtonIcon} name="closecircle" />
+                <MaterialIcons style={styles.backButtonIcon} name="cancel" />
                 <Text style={styles.backButtonText}>close</Text>
               </TouchableOpacity>
             </ScrollView>

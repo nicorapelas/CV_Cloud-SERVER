@@ -6,7 +6,7 @@ import {
   Keyboard,
   Platform,
 } from 'react-native'
-import { AntDesign } from '@expo/vector-icons'
+import { AntDesign, MaterialIcons } from '@expo/vector-icons'
 
 import { Context as NavContext } from '../../context/NavContext'
 import { Context as UniversalContext } from '../../context/UniversalContext'
@@ -44,7 +44,6 @@ const FormCancelButton = ({ route }) => {
   const { clearTertEduErrors } = useContext(TertEduContext)
 
   const clearErrors = () => {
-    console.log(`route`, route)
     switch (route) {
       case 'attribute':
         clearAttributeErrors()
@@ -108,7 +107,7 @@ const FormCancelButton = ({ route }) => {
         style={styles.addButtonContainer}
         onPress={handlePressCancel}
       >
-        <AntDesign name="back" style={styles.cancelButtonIcon} />
+        <MaterialIcons name="arrow-back" style={styles.cancelButtonIcon} />
         <Text
           style={
             Platform.OS === 'ios'

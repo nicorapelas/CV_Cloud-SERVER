@@ -311,7 +311,7 @@ const SecondEduEditForm = () => {
                   Keyboard.dismiss()
                 }}
               >
-                <AntDesign name="caretdown" style={styles.addButtonIcon} />
+                <MaterialIcons name="check-circle" style={styles.addButtonIcon} />
                 <Text
                   style={
                     Platform.OS === 'ios'

@@ -49,7 +49,7 @@ const CertificateEditScreen = () => {
         <View>
           <ScrollView keyboardShouldPersistTaps="always">
             {!photoUrl ? (
-              <AntDesign name="pdffile1" style={styles.fileSelectedIcon} />
+              <MaterialIcons name="picture-as-pdf" style={styles.fileSelectedIcon} />
             ) : (
               <Image
                 style={styles.photo}

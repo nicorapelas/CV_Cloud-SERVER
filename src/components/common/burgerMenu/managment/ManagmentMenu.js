@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native'
-import { AntDesign } from '@expo/vector-icons'
+import { AntDesign, MaterialIcons } from '@expo/vector-icons'
 
 import { Context as BurgerMenuContext } from '../../../../context/BurgerMenuContext'
 import { Context as AuthContext } from '../../../../context/AuthContext'
@@ -55,7 +55,7 @@ const Managment = () => {
           style={styles.backButton}
           onPress={() => setInfoToShow('')}
         >
-          <AntDesign name="closecircle" style={styles.backButtonIcon} />
+          <MaterialIcons name="cancel" style={styles.backButtonIcon} />
           <Text style={styles.backButtonText}>back</Text>
         </TouchableOpacity>
         <TextInput
@@ -115,7 +115,7 @@ const Managment = () => {
             clearAffiliates()
           }}
         >
-          <AntDesign name="closecircle" style={styles.backButtonIcon} />
+          <MaterialIcons name="cancel" style={styles.backButtonIcon} />
           <Text style={styles.backButtonText}>back</Text>
         </TouchableOpacity>
       </View>

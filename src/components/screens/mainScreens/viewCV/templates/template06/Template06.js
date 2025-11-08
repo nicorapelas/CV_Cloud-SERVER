@@ -105,7 +105,7 @@ const Template06 = ({
 
       return momentDate.format('MMM YYYY')
     } catch (error) {
-      console.warn('Date formatting error:', error, 'for date:', dateString)
+      // Silently fall back to original string if date formatting fails
       return dateString
     }
   }

@@ -39,11 +39,8 @@ const AttributeEditForm = () => {
 
   useEffect(() => {
     if (attributeToEdit) {
-      console.log('AttributeEditForm - attributeToEdit:', attributeToEdit)
       const { attribute } = attributeToEdit
       setAttribute(attribute)
-    } else {
-      console.log('AttributeEditForm - attributeToEdit is null')
     }
   }, [attributeToEdit])
 
@@ -59,7 +56,6 @@ const AttributeEditForm = () => {
   }
 
   const handlePressEdit = () => {
-    console.log('handlePressEdit called with:', { attribute, attributeToEdit })
     if (
       !attribute ||
       attribute.length < 1 ||
@@ -69,7 +65,6 @@ const AttributeEditForm = () => {
       Keyboard.dismiss()
     } else {
       const { _id } = attributeToEdit
-      console.log('Calling editAttribute with:', { id: _id, attribute })
       editAttribute({ id: _id, attribute })
       tipSelectReset()
       setCVBitScreenSelected('attribute')

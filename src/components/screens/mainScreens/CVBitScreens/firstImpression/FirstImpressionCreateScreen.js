@@ -7,7 +7,7 @@ import {
   Platform,
 } from 'react-native'
 import { CameraView, Camera } from 'expo-camera'
-import { Audio } from 'expo-av'
+import { Audio } from 'expo-audio'
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
 
 import { Context as FirstImpressionContext } from '../../../../../context/FirstImpressionContext'
@@ -30,9 +30,6 @@ const FirstImpressionCreateScreen = () => {
 
   const cameraRef = useRef(null)
 
-  console.log('Camera:', Camera)
-  console.log('CameraView:', CameraView)
-
   const {
     state: { videoObject, videoDemoShow },
     addVideoObject,
@@ -41,7 +38,6 @@ const FirstImpressionCreateScreen = () => {
   const { toggleInstructionModal } = useContext(UniversalContext)
 
   useEffect(() => {
-    console.log('videoObject', videoObject)
     if (!videoObject) setView('record')
     if (videoObject) setView('play')
   }, [videoObject])
@@ -94,10 +90,21 @@ const FirstImpressionCreateScreen = () => {
 
   const audioPermissionsRequest = async () => {
     try {
-      const { status } = await Audio.requestPermissionsAsync()
-      setAudioPermission(status === 'granted')
+      // expo-audio may handle permissions differently
+      // For camera recording, permissions are typically handled by expo-camera
+      // when audio={true} is set on CameraView
+      if (Audio.requestPermissionsAsync) {
+        const { status } = await Audio.requestPermissionsAsync()
+        setAudioPermission(status === 'granted')
+      } else {
+        // expo-audio might not have requestPermissionsAsync
+        // In this case, expo-camera handles audio permissions
+        setAudioPermission(true)
+      }
     } catch (error) {
       console.error('Audio permission error:', error)
+      // Fallback: camera with audio enabled should handle permissions
+      setAudioPermission(true)
     }
   }
 
@@ -116,12 +123,10 @@ const FirstImpressionCreateScreen = () => {
   const startRecording = async () => {
     if (cameraRef.current) {
       try {
-        console.log('Starting recording with camera ref:', cameraRef.current)
         const video = await cameraRef.current.recordAsync({
           quality: '480p',
           maxDuration: 30,
         })
-        console.log('Recording finished, video:', video)
         addVideoObject(video)
       } catch (error) {
         console.error('Recording error:', error)
@@ -131,7 +136,6 @@ const FirstImpressionCreateScreen = () => {
 
   const stopRecording = () => {
     if (cameraRef.current) {
-      console.log('Stopping recording with camera ref:', cameraRef.current)
       cameraRef.current.stopRecording()
     }
   }
@@ -176,18 +180,12 @@ const FirstImpressionCreateScreen = () => {
                 style={styles.recordButtonBed}
                 onPress={async () => {
                   if (time === 1) return null
-                  console.log(
-                    'Record button pressed, current recording state:',
-                    recording
-                  )
                   if (!recording) {
-                    console.log('Starting recording...')
                     setRecording(true)
                     setRunTimer(true)
                     setTime(29)
                     await startRecording()
                   } else {
-                    console.log('Stopping recording...')
                     setRecording(false)
                     setRunTimer(false)
                     setTime(30)

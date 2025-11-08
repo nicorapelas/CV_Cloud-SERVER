@@ -10,7 +10,7 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated'
-import { AntDesign } from '@expo/vector-icons'
+import { AntDesign, MaterialIcons } from '@expo/vector-icons'
 
 import { Context as UniversalContext } from '../../context/UniversalContext'
 
@@ -52,7 +52,7 @@ const ImageViewer = () => {
               marginTop: '20%',
             }}
           >
-            <AntDesign name="closecircle" style={styles.closeButton} />
+            <MaterialIcons name="cancel" style={styles.closeButton} />
           </TouchableOpacity>
         </View>
         <GestureDetector gesture={pinchGesture}>

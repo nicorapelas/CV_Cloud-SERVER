@@ -7,7 +7,7 @@ import {
   ScrollView,
   Platform,
 } from 'react-native'
-import { AntDesign } from '@expo/vector-icons'
+import { AntDesign, MaterialIcons } from '@expo/vector-icons'
 
 import { Context as BurgerMenuContext } from '../../../context/BurgerMenuContext'
 import { Context as UniversalContext } from '../../../context/UniversalContext'
@@ -27,7 +27,7 @@ const TermsAndConditions = () => {
     return (
       <ScrollView style={styles.container}>
         <TouchableOpacity style={styles.topCloseButton} onPress={handlePress}>
-          <AntDesign name="closecircle" style={styles.backButtonIcon} />
+          <MaterialIcons name="cancel" style={styles.backButtonIcon} />
         </TouchableOpacity>
         <Text style={styles.heading}>CV CLOUD</Text>
         <Text style={styles.heading}>
@@ -1483,7 +1483,7 @@ const TermsAndConditions = () => {
           E-mail address: nicorapelas@gmail.com
         </Text>
         <TouchableOpacity style={styles.backButton} onPress={handlePress}>
-          <AntDesign name="closecircle" style={styles.backButtonIcon} />
+          <MaterialIcons name="cancel" style={styles.backButtonIcon} />
           <Text style={styles.backButtonText}>close</Text>
         </TouchableOpacity>
       </ScrollView>

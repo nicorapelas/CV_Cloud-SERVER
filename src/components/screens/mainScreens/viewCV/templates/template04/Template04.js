@@ -551,7 +551,7 @@ const Template04 = ({
 const styles = StyleSheet.create({
   proficiencyContainer: {
     flexDirection: 'row',
-    gap: 4,
+    alignItems: 'center',
   },
   proficiencyDot: {
     width: 8,
@@ -560,6 +560,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#e5e7eb',
     borderWidth: 1,
     borderColor: '#d1d5db',
+    marginRight: 5,
   },
   proficiencyDotFilled: {
     backgroundColor: '#06b6d4',
@@ -797,9 +798,8 @@ const stylesZoomedOut = StyleSheet.create({
     gap: 8,
   },
   skillItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
     padding: 10,
     backgroundColor: '#1e293b',
     borderRadius: 6,
@@ -810,6 +810,7 @@ const stylesZoomedOut = StyleSheet.create({
     fontWeight: '600',
     color: '#f8fafc',
     fontSize: 11,
+    marginBottom: 6,
   },
 
   // Languages list
@@ -836,11 +837,13 @@ const stylesZoomedOut = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    marginBottom: 2,
   },
   languageProficiencyLabel: {
     fontSize: 9,
     color: '#94a3b8',
-    minWidth: 40,
+    minWidth: 50,
+    marginRight: 4,
   },
 
   // References list
@@ -1160,9 +1163,8 @@ const stylesZoomedIn = StyleSheet.create({
     gap: 12,
   },
   skillItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
     padding: 15,
     backgroundColor: '#1e293b',
     borderRadius: 9,
@@ -1173,6 +1175,7 @@ const stylesZoomedIn = StyleSheet.create({
     fontWeight: '600',
     color: '#f8fafc',
     fontSize: 16,
+    marginBottom: 10,
   },
 
   // Languages list
@@ -1199,11 +1202,13 @@ const stylesZoomedIn = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+    marginBottom: 3,
   },
   languageProficiencyLabel: {
     fontSize: 14,
     color: '#94a3b8',
-    minWidth: 60,
+    minWidth: 70,
+    marginRight: 6,
   },
 
   // References list

@@ -1,7 +1,11 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { View, StyleSheet, TouchableOpacity, Text, Alert } from 'react-native'
-import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons'
-import { Video } from 'expo-av'
+import {
+  AntDesign,
+  MaterialCommunityIcons,
+  MaterialIcons,
+} from '@expo/vector-icons'
+import { VideoView, useVideoPlayer } from 'expo-video'
 import { keys } from '../../../../../../../config/keys_dev'
 
 import LoaderWithText from '../../../../../common/LoaderWithText'
@@ -9,10 +13,8 @@ import LoaderFullScreen from '../../../../../common/LoaderFullScreen'
 import { Context as FirstImpressionContext } from '../../../../../../context/FirstImpressionContext'
 import { Context as NavContext } from '../../../../../../context/NavContext'
 
-const VideoPlaybackUpload = ({ videoObject }) => { console.log("🎬 VideoPlaybackUpload received videoObject:", videoObject); 
-  VideoPlaybackUpload
-  const video = React.useRef(null)
-  const [status, setStatus] = React.useState({})
+const VideoPlaybackUpload = ({ videoObject }) => {
+  const [isPlaying, setIsPlaying] = useState(false)
   const [videoFileName, setVideoFileName] = useState(null)
   const [loaderSubText, setLoaderSubText] = useState(0)
 
@@ -27,10 +29,37 @@ const VideoPlaybackUpload = ({ videoObject }) => { console.log("🎬 VideoPlayba
 
   const { setCVBitScreenSelected } = useContext(NavContext)
 
+  const player = useVideoPlayer(
+    videoObject?.uri ? { uri: videoObject.uri } : undefined
+  )
+
   useEffect(() => {
-    setVideoFileName(`${randomFileName}.${videoObject.uri.split('.')[1]}`)
+    if (videoObject?.uri) {
+      const randomFileName =
+        Math.random().toString(36).substring(2, 15) +
+        Math.random().toString(36).substring(2, 15) +
+        Date.now().toString()
+      setVideoFileName(`${randomFileName}.${videoObject.uri.split('.')[1]}`)
+      if (player) {
+        player.replaceAsync({ uri: videoObject.uri }).then(() => {
+          player.loop = true
+        })
+      }
+    }
     return () => setVideoUploading(false)
-  }, [])
+  }, [videoObject?.uri])
+
+  useEffect(() => {
+    if (!player) return
+
+    const subscription = player.addListener('playingChange', (newIsPlaying) => {
+      setIsPlaying(newIsPlaying)
+    })
+
+    return () => {
+      subscription.remove()
+    }
+  }, [player])
 
   useEffect(() => {
     if (uploadSignature) {
@@ -47,11 +76,6 @@ const VideoPlaybackUpload = ({ videoObject }) => { console.log("🎬 VideoPlayba
       return () => clearTimeout(t)
     }
   }, [videoUploading])
-
-  const randomFileName =
-    Math.random().toString(36).substring(2, 15) +
-    Math.random().toString(36).substring(2, 15) +
-    Date.now().toString()
 
   const videoUpload = () => {
     const { apiKey, signature, timestamp } = uploadSignature
@@ -125,30 +149,25 @@ const VideoPlaybackUpload = ({ videoObject }) => { console.log("🎬 VideoPlayba
     if (loading) return <LoaderFullScreen />
     return (
       <View style={styles.videoBed}>
-        <Video
-          ref={video}
+        <VideoView
+          player={player}
           style={styles.video}
-          source={{
-            uri: videoObject.uri,
-          }}
-          useNativeControls
-          resizeMode="contain"
-          onPlaybackStatusUpdate={(status) => setStatus(() => status)}
-          isLooping={true}
+          nativeControls
+          contentFit="contain"
+          fullscreenOptions={{ enterFullscreenButtonVisible: true }}
         />
         <View style={styles.buttonsBed}>
           <TouchableOpacity
             style={styles.playButton}
-            onPress={() =>
-              status.isPlaying
-                ? video.current.pauseAsync()
-                : video.current.playAsync()
-            }
+            onPress={() => (isPlaying ? player.pause() : player.play())}
           >
-            {status.isPlaying ? (
-              <AntDesign name="pausecircle" style={styles.playButtonIcon} />
+            {isPlaying ? (
+              <MaterialIcons
+                name="pause-circle"
+                style={styles.playButtonIcon}
+              />
             ) : (
-              <AntDesign name="play" style={styles.playButtonIcon} />
+              <MaterialIcons name="play-circle" style={styles.playButtonIcon} />
             )}
           </TouchableOpacity>
           <TouchableOpacity
@@ -204,7 +223,7 @@ const styles = StyleSheet.create({
   },
   deleteButtonIcon: {
     color: 'red',
-    fontSize: 50,
+    fontSize: 42,
   },
   uploadButton: {
     backgroundColor: '#278ACD',

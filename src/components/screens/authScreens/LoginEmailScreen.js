@@ -137,6 +137,8 @@ const LoginEmailScreen = () => {
               onChangeText={setPassword}
               autoCapitalize="none"
               autoCorrect={false}
+              autoComplete="off"
+              textContentType="oneTimeCode"
               onFocus={clearErrorMessage}
               secureTextEntry={!showPassword}
             />
@@ -176,6 +178,9 @@ const LoginEmailScreen = () => {
               routeName="passwordForgot"
               text="Forgot your password? Reset password here."
             />
+          </View>
+          <View style={styles.navLink}>
+            <NavLink routeName="registerOrLogin" text="← Cancel" />
           </View>
         </View>
       </View>

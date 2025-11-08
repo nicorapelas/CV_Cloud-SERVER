@@ -10,7 +10,7 @@ import {
   Modal,
   FlatList,
 } from 'react-native'
-import { AntDesign } from '@expo/vector-icons'
+import { AntDesign, MaterialIcons } from '@expo/vector-icons'
 
 import LoaderWithText from '../../../common/LoaderWithText'
 import logo from '../../../../../assets/images/logo-h79.png'
@@ -183,9 +183,6 @@ const ViewCVScreen = () => {
     fetchTertEduSample()
   }, [])
 
-  console.log('secondEdu:', secondEdu)
-  console.log('skills:', skills)
-
   const userRedirect = () => {
     if (personalInfo === null || contactInfo === null) return null
     if (personalInfo.length < 1 && contactInfo.length < 1) {
@@ -276,7 +273,7 @@ const ViewCVScreen = () => {
                       {item.label}
                     </Text>
                     {selectedTemplate === item.value && (
-                      <AntDesign name="check" size={16} color="#007AFF" />
+                      <MaterialIcons name="check" size={16} color="#007AFF" />
                     )}
                   </TouchableOpacity>
                 )}

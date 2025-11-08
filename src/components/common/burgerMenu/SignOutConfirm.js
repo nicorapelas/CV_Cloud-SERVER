@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
-import { AntDesign } from '@expo/vector-icons'
+import { AntDesign, MaterialIcons } from '@expo/vector-icons'
 
 import { Context as BurgerMenuContext } from '../../../context/BurgerMenuContext'
 import { Context as AuthContext } from '../../../context/AuthContext'
@@ -37,7 +37,7 @@ const SignOutConfirm = () => {
           style={styles.messageBackButton}
           onPress={handleBackPress}
         >
-          <AntDesign name="closecircle" style={styles.messageBackButtonIcon} />
+          <MaterialIcons name="cancel" style={styles.messageBackButtonIcon} />
           <Text style={styles.messageBackButtonText}>back</Text>
         </TouchableOpacity>
       </View>

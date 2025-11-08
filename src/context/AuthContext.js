@@ -75,7 +75,14 @@ const tryLocalSignin = (dispatch) => async () => {
 
 const register =
   (dispatch) =>
-  async ({ fullName, email, password, password2, introAffiliateCode }) => {
+  async ({
+    fullName,
+    email,
+    password,
+    password2,
+    introAffiliateCode,
+    termsAccepted,
+  }) => {
     dispatch({ type: 'LOADING' })
     try {
       const response = await ngrokApi.post('/auth/user/register', {
@@ -84,6 +91,7 @@ const register =
         password,
         password2,
         affiliatceIntroCode: introAffiliateCode,
+        termsAccepted,
       })
       if (response.data.error)
         dispatch({ type: 'ADD_ERROR', payload: response.data.error })
@@ -134,13 +142,24 @@ const login =
           type: 'ADD_ERROR',
           payload: response.data.error,
         })
+        dispatch({ type: 'STOP_LOADING' })
       } else {
         await AsyncStorage.setItem('token', response.data.token)
         dispatch({ type: 'SIGN_IN', payload: response.data.token })
         dispatch({ type: 'STOP_LOADING' })
       }
     } catch (err) {
-      await ngrokApi.post('/error', { error: err })
+      // Network or unexpected error – stop loading and surface a friendly message
+      try {
+        // Best-effort logging; ignore failures
+        await ngrokApi.post('/error', { error: err?.message || String(err) })
+      } catch (_) {}
+      dispatch({
+        type: 'ADD_ERROR',
+        payload:
+          'Unable to reach server. Please check your connection and try again.',
+      })
+      dispatch({ type: 'STOP_LOADING' })
       return
     }
   }

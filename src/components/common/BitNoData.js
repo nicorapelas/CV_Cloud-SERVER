@@ -39,7 +39,7 @@ const BitNoData = ({ cvBit, routeName, buttonText }) => {
           setCVBitScreenSelected('')
         }}
       >
-        <AntDesign style={styles.backButtonIcon} name="back" />
+        <MaterialIcons style={styles.backButtonIcon} name="arrow-back" />
         <Text style={styles.backButtonText}>back</Text>
       </TouchableOpacity>
     </View>

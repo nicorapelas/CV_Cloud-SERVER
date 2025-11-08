@@ -19,8 +19,10 @@ import FormCancelButton from '../../../../../common/FormCancelButton'
 import validateEmailInput from '../../../../../../validation/email'
 import validatePhoneInput from '../../../../../../validation/phone'
 import { Context as ContactInfoContext } from '../../../../../../context/ContactInfoContext'
+import { Context as PersonalInfoContext } from '../../../../../../context/PersonalInfoContext'
 import { Context as UniversalContext } from '../../../../../../context/UniversalContext'
 import { Context as NavContext } from '../../../../../../context/NavContext'
+import { getCountryConfig } from '../../../../../../utils/countryConfig'
 
 const ContactInfoCreateForm = () => {
   const [email, setEmail] = useState(null)
@@ -48,7 +50,20 @@ const ContactInfoCreateForm = () => {
     clearErrors,
   } = useContext(ContactInfoContext)
 
+  const {
+    state: { personalInfo },
+    fetchPersonalInfo,
+  } = useContext(PersonalInfoContext)
+
   const { setCVBitScreenSelected } = useContext(NavContext)
+
+  // Get user's country from personalInfo, default to 'ZA'
+  const userCountry = personalInfo?.country || 'ZA'
+  const countryConfig = getCountryConfig(userCountry)
+
+  useEffect(() => {
+    fetchPersonalInfo() // Fetch to get user's country
+  }, [])
 
   const keyboard = useKeyboard()
 
@@ -141,11 +156,11 @@ const ContactInfoCreateForm = () => {
     if (!emailInputShow) return null
     return (
       <View>
-        <Text style={styles.inputHeader}>Email address</Text>
+        <Text style={styles.inputHeader}>Email Address</Text>
         <TextInput
           style={styles.input}
           textAlign="center"
-          placeholder="email"
+          placeholder="Enter your email address"
           value={email}
           autoFocus={!error ? true : false}
           onFocus={() => clearErrors()}
@@ -201,11 +216,11 @@ const ContactInfoCreateForm = () => {
     if (!phoneInputShoow) return null
     return (
       <View>
-        <Text style={styles.inputHeader}>Phone number</Text>
+        <Text style={styles.inputHeader}>Phone Number</Text>
         <TextInput
           style={styles.input}
           textAlign="center"
-          placeholder="phone number"
+          placeholder="Enter your phone number"
           value={phone}
           onFocus={() => clearErrors()}
           autoFocus={!error ? true : false}
@@ -312,15 +327,27 @@ const ContactInfoCreateForm = () => {
     if (!addressInputShow) return null
     return (
       <View>
-        <Text style={styles.inputHeader}>Residential address</Text>
-        {addressField('Unit', 'unit', 'unit')}
-        {addressField('Complex', 'complex', 'complex')}
-        {addressField('Street', 'street', 'address')}
-        {addressField('Suburb', 'suburb', 'suburb')}
-        {addressField('City', 'city', 'city')}
-        {addressField('Province', 'province', 'province')}
-        {addressField('Country', 'country', 'country')}
-        {addressField('Postal code', 'postal code', 'postalCode')}
+        <Text style={styles.inputHeader}>Address Information</Text>
+        {addressField('Unit Number', 'Unit/Flat number', 'unit')}
+        {addressField('Complex Name', 'Complex/Building name', 'complex')}
+        {addressField('Street Address', 'Enter your street address', 'address')}
+        {addressField(
+          userCountry === 'PH' ? 'Barangay' : userCountry === 'NG' ? 'LGA' : 'Suburb',
+          userCountry === 'PH' ? 'Barangay' : userCountry === 'NG' ? 'Local Government Area' : 'Suburb/Neighborhood',
+          'suburb'
+        )}
+        {addressField('City', 'City', 'city')}
+        {addressField(
+          userCountry === 'PH' ? 'Region' : userCountry === 'NG' ? 'State' : 'Province/State',
+          userCountry === 'PH' ? 'Region' : userCountry === 'NG' ? 'State' : 'Province or State',
+          'province'
+        )}
+        {countryConfig.addressFields.country && addressField('Country', 'Country', 'country')}
+        {addressField(
+          userCountry === 'PH' ? 'ZIP Code' : 'Postal Code',
+          userCountry === 'PH' ? 'ZIP code' : 'Postal/ZIP code',
+          'postalCode'
+        )}
         <View style={styles.nextBackButtonsBed}>
           <TouchableOpacity
             style={styles.addButtonContainer}
@@ -375,13 +402,13 @@ const ContactInfoCreateForm = () => {
       <View style={styles.previewBed}>
         {!email ? null : (
           <View>
-            <Text style={styles.previewLabel}>Email address</Text>
+            <Text style={styles.previewLabel}>Email Address</Text>
             <Text style={styles.previewText}>{email}</Text>
           </View>
         )}
         {!phone ? null : (
           <View>
-            <Text style={styles.previewLabel}>Phone number</Text>
+            <Text style={styles.previewLabel}>Phone Number</Text>
             <Text style={styles.previewText}>{phone}</Text>
           </View>
         )}
@@ -392,7 +419,7 @@ const ContactInfoCreateForm = () => {
         (!country || country.length < 1) &&
         (!postalCode || postalCode.length < 1) ? null : (
           <View>
-            <Text style={styles.previewLabel}>Residential address</Text>
+            <Text style={styles.previewLabel}>Address Information</Text>
             {!unit || unit.length < 1 ? null : (
               <Text>
                 {!complex || complex.length === 0 ? null : 'unit:'}

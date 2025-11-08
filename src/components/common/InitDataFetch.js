@@ -18,45 +18,48 @@ import { Context as TertEduContext } from '../../context/TertEduContext'
 import { Context as UniversalContext } from '../../context/UniversalContext'
 
 const InitDataFetch = () => {
-    const { fetchAttributes } = useContext(AttributeContext)
-    const { fetchCertificates } = useContext(CertificateContext)
-    const { fetchContactInfo } = useContext(ContactInfoContext)
-    const { fetchEmployHistorys } = useContext(EmployHistoryContext)
-    const { fetchExperiences } = useContext(ExperienceContext)
-    const { fetchFirstImpression } = useContext(FirstImpressionContext)
-    const { fetchInterests } = useContext(InterestContext)
-    const { fetchLanguages } = useContext(LanguageContext)
-    const { fetchPersonalInfo } = useContext(PersonalInfoContext)
-    const { fetchPersonalSummary } = useContext(PersonalSummaryContext)
-    const { fetchPhotos } = useContext(PhotoContext)
-    const { fetchReferences } = useContext(ReferenceContext)
-    const { fetchSecondEdu } = useContext(SecondEduContext)
-    const { fetchSkills } = useContext(SkillContext)
-    const { fetchTertEdus } = useContext(TertEduContext)
-    const { state: { initDataFetchDone }, setInitDataFetchDone } = useContext(UniversalContext)
+  const { fetchAttributes } = useContext(AttributeContext)
+  const { fetchCertificates } = useContext(CertificateContext)
+  const { fetchContactInfo } = useContext(ContactInfoContext)
+  const { fetchEmployHistorys } = useContext(EmployHistoryContext)
+  const { fetchExperiences } = useContext(ExperienceContext)
+  const { fetchFirstImpression } = useContext(FirstImpressionContext)
+  const { fetchInterests } = useContext(InterestContext)
+  const { fetchLanguages } = useContext(LanguageContext)
+  const { fetchPersonalInfo } = useContext(PersonalInfoContext)
+  const { fetchPersonalSummary } = useContext(PersonalSummaryContext)
+  const { fetchPhotos } = useContext(PhotoContext)
+  const { fetchReferences } = useContext(ReferenceContext)
+  const { fetchSecondEdu } = useContext(SecondEduContext)
+  const { fetchSkills } = useContext(SkillContext)
+  const { fetchTertEdus } = useContext(TertEduContext)
+  const {
+    state: { initDataFetchDone },
+    setInitDataFetchDone,
+  } = useContext(UniversalContext)
 
-    useEffect(() => {
-        if (!initDataFetchDone) {
-            fetchAttributes()
-            fetchCertificates()
-            fetchContactInfo()
-            fetchEmployHistorys()
-            fetchExperiences()
-            fetchFirstImpression()
-            fetchInterests()
-            fetchLanguages()
-            fetchPersonalInfo()
-            fetchPersonalSummary()
-            fetchPhotos()
-            fetchReferences()
-            fetchSecondEdu()
-            fetchSkills()
-            fetchTertEdus()
-            setInitDataFetchDone(true)
-        }
-    }, [initDataFetchDone])
+  useEffect(() => {
+    if (!initDataFetchDone) {
+      fetchAttributes()
+      fetchCertificates()
+      fetchContactInfo()
+      fetchEmployHistorys()
+      fetchExperiences()
+      fetchFirstImpression()
+      fetchInterests()
+      fetchLanguages()
+      fetchPersonalInfo()
+      fetchPersonalSummary()
+      fetchPhotos()
+      fetchReferences()
+      fetchSecondEdu()
+      fetchSkills()
+      fetchTertEdus()
+      setInitDataFetchDone(true)
+    }
+  }, [initDataFetchDone])
 
-    return null
+  return null
 }
 
 export default InitDataFetch

@@ -143,7 +143,7 @@ const CertificatePdfUploadScreen = () => {
       )
     return (
       <View style={styles.textInputBed}>
-          <AntDesign name="pdffile1" style={styles.fileSelectedIcon} />
+          <MaterialIcons name="picture-as-pdf" style={styles.fileSelectedIcon} />
           <Text style={styles.fileSelected}>{pdfUrl.name}</Text>
           <TextInput
             style={styles.input}

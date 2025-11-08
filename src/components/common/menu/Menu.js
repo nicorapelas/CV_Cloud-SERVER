@@ -8,6 +8,7 @@ import DeleteAccount from '../burgerMenu/DeleteAccount'
 import AppVersion from '../burgerMenu/AppVersion'
 import Managment from '../burgerMenu/managment/Managment'
 import { Context as BurgerMenuContext } from '../../../context/BurgerMenuContext'
+import { Context as NavContext } from '../../../context/NavContext'
 
 const { width } = Dimensions.get('window')
 
@@ -17,6 +18,10 @@ const Menu = () => {
   const {
     state: { burgerMenuVisible },
   } = useContext(BurgerMenuContext)
+
+  const {
+    state: { navTabSelected },
+  } = useContext(NavContext)
 
   useEffect(() => {
     Animated.timing(slideAnim, {
@@ -30,15 +35,17 @@ const Menu = () => {
     <View style={styles.container}>
       {/* Main View Content */}
       <MainViewRender />
-      <Animated.View
-        style={[styles.menu, { transform: [{ translateX: slideAnim }] }]}
-      >
-        <TermsAndConditionsBurgerButton />
-        <SignOut />
-        <DeleteAccount />
-        <Managment />
-        <AppVersion />
-      </Animated.View>
+      {navTabSelected === 'dashboard' && (
+        <Animated.View
+          style={[styles.menu, { transform: [{ translateX: slideAnim }] }]}
+        >
+          <TermsAndConditionsBurgerButton />
+          <SignOut />
+          <DeleteAccount />
+          <Managment />
+          <AppVersion />
+        </Animated.View>
+      )}
     </View>
   )
 }

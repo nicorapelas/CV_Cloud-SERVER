@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View, Modal } from 'react-native'
-import { AntDesign, FontAwesome } from '@expo/vector-icons'
+import { AntDesign, FontAwesome, MaterialIcons } from '@expo/vector-icons'
 
 import { Context as AttributeContext } from '../../../context/AttributeContext'
 import { Context as CertificateContext } from '../../../context/CertificateContext'
@@ -189,7 +189,7 @@ const DeleteModal = ({
               style={styles.backButton}
               onPress={handlePressCancel}
             >
-              <AntDesign name="closecircle" style={styles.backButtonIcon} />
+              <MaterialIcons name="cancel" style={styles.backButtonIcon} />
               <Text style={styles.backButtonText}>cancel</Text>
             </TouchableOpacity>
           </View>

@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react'
+import React, { useState, useContext, useEffect, useRef } from 'react'
 import { View, StyleSheet, Platform } from 'react-native'
 
 import InfoFullscreenRender from '../../common/InfoFullscreenRender'
@@ -17,6 +17,8 @@ import { Context as FirstImpressionContext } from '../../../context/FirstImpress
 
 const Main = () => {
   const [showHeader, setShowHeader] = useState(true)
+  const [showFullAdPopup, setShowFullAdPopup] = useState(false)
+  const adTimerRef = useRef(null)
 
   const {
     state: { user },
@@ -29,8 +31,7 @@ const Main = () => {
   } = useContext(BurgerMenuContext)
 
   const {
-    state: { bannerAdFullShow },
-    setBannerAdFullShow,
+    state: { bannerAdFullShow, settingsLoaded },
   } = useContext(AdvertisementContext)
 
   const {
@@ -63,17 +64,32 @@ const Main = () => {
     }
   }, [user])
 
+  // Show full ad popup ONCE when settings load and it's enabled
   useEffect(() => {
-    if (bannerAdFullShow) {
-      const timer = setTimeout(() => {
-        setBannerAdFullShow(false)
+    if (
+      settingsLoaded &&
+      bannerAdFullShow &&
+      user?.tier !== 'premium' &&
+      !adTimerRef.current // Only if timer hasn't been set
+    ) {
+      setShowFullAdPopup(true)
+
+      adTimerRef.current = setTimeout(() => {
+        setShowFullAdPopup(false)
+        adTimerRef.current = null
       }, 5000)
-      return () => clearTimeout(timer)
     }
-  }, [bannerAdFullShow])
+
+    // Cleanup on unmount
+    return () => {
+      if (adTimerRef.current) {
+        clearTimeout(adTimerRef.current)
+        adTimerRef.current = null
+      }
+    }
+  }, [settingsLoaded, bannerAdFullShow, user?.tier])
 
   useEffect(() => {
-    console.log(`CVBitScreenSelected:`, CVBitScreenSelected)
     if (
       CVBitScreenSelected === 'attributeCreate' ||
       CVBitScreenSelected === 'attributeEdit' ||
@@ -133,7 +149,8 @@ const Main = () => {
 
   const renderContent = () => {
     if (!user) return <LoaderFullScreen />
-    if (bannerAdFullShow) return <BannerAdFullRender />
+    // Show full banner ad popup (separate from database setting)
+    if (showFullAdPopup) return <BannerAdFullRender />
     if (InfoToShow !== '') return <InfoFullscreenRender />
     return (
       <View style={styles.container}>

@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { TouchableOpacity, StyleSheet, Text } from 'react-native'
-import { AntDesign } from '@expo/vector-icons'
+import { AntDesign, MaterialIcons } from '@expo/vector-icons'
 import { View } from 'react-native'
 
 import { Context as NavContext } from '../../context/NavContext'
@@ -15,9 +15,9 @@ const DoneButton = ({ routeName, text }) => {
         onPress={() => setCVBitScreenSelected(routeName)}
       >
         {routeName === 'photo' ? (
-          <AntDesign name="back" style={styles.icon} />
+          <MaterialIcons name="arrow-back" style={styles.icon} />
         ) : (
-          <AntDesign name="checkcircle" style={styles.icon} />
+          <MaterialIcons name="check-circle" style={styles.icon} />
         )}
 
         <Text style={styles.text}>{text}</Text>

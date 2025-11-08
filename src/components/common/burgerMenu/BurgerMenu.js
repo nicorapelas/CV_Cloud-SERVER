@@ -3,6 +3,7 @@ import { StyleSheet, TouchableOpacity, Platform } from 'react-native'
 import { Entypo } from '@expo/vector-icons'
 
 import { Context as BurgerMenuContext } from '../../../context/BurgerMenuContext'
+import { Context as NavContext } from '../../../context/NavContext'
 
 const BurgerMenu = () => {
   const {
@@ -10,6 +11,10 @@ const BurgerMenu = () => {
     setBurgerMenuVisible,
     getLatestAppVersion,
   } = useContext(BurgerMenuContext)
+
+  const {
+    state: { navTabSelected },
+  } = useContext(NavContext)
 
   useEffect(() => {
     getLatestAppVersion()
@@ -25,6 +30,10 @@ const BurgerMenu = () => {
         <Entypo name="menu" style={styles.burgerMenuIcon} />
       </TouchableOpacity>
     )
+  }
+
+  if (navTabSelected !== 'dashboard') {
+    return null
   }
 
   return burgerMenuButton()

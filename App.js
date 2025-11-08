@@ -31,6 +31,7 @@ import { Provider as TertEduProvider } from './src/context/TertEduContext'
 import { Provider as PhotoProvider } from './src/context/PhotoContext'
 import { Provider as CertificateProvider } from './src/context/CertificateContext'
 import { Provider as ShareCVProvider } from './src/context/ShareCVContext'
+import { Provider as PublicCVProvider } from './src/context/PublicCVContext'
 import { Provider as BurgerMenuProvider } from './src/context/BurgerMenuContext'
 import { Provider as AffiliateProvider } from './src/context/AffiliateContext'
 import { Provider as ConfigProvider } from './src/context/ConfigContext'
@@ -63,39 +64,41 @@ export default function App() {
             <BurgerMenuProvider>
               <AffiliateProvider>
                 <ShareCVProvider>
-                  <AttributeProvider>
-                    <ContactInfoProvider>
-                      <EmployHistoryProvider>
-                        <ExperienceProvider>
-                          <InterestProvider>
-                            <FirstImpressionProvider>
-                              <LanguageProvider>
-                                <PersonalInfoProvider>
-                                  <PersonalSummaryProvider>
-                                    <ReferenceProvider>
-                                      <SecondEduProvider>
-                                        <SkillProvider>
-                                          <TertEduProvider>
-                                            <PhotoProvider>
-                                              <CertificateProvider>
-                                                <AdvertisementReducer>
-                                                  <AppScreens />
-                                                </AdvertisementReducer>
-                                              </CertificateProvider>
-                                            </PhotoProvider>
-                                          </TertEduProvider>
-                                        </SkillProvider>
-                                      </SecondEduProvider>
-                                    </ReferenceProvider>
-                                  </PersonalSummaryProvider>
-                                </PersonalInfoProvider>
-                              </LanguageProvider>
-                            </FirstImpressionProvider>
-                          </InterestProvider>
-                        </ExperienceProvider>
-                      </EmployHistoryProvider>
-                    </ContactInfoProvider>
-                  </AttributeProvider>
+                  <PublicCVProvider>
+                    <AttributeProvider>
+                      <ContactInfoProvider>
+                        <EmployHistoryProvider>
+                          <ExperienceProvider>
+                            <InterestProvider>
+                              <FirstImpressionProvider>
+                                <LanguageProvider>
+                                  <PersonalInfoProvider>
+                                    <PersonalSummaryProvider>
+                                      <ReferenceProvider>
+                                        <SecondEduProvider>
+                                          <SkillProvider>
+                                            <TertEduProvider>
+                                              <PhotoProvider>
+                                                <CertificateProvider>
+                                                  <AdvertisementReducer>
+                                                    <AppScreens />
+                                                  </AdvertisementReducer>
+                                                </CertificateProvider>
+                                              </PhotoProvider>
+                                            </TertEduProvider>
+                                          </SkillProvider>
+                                        </SecondEduProvider>
+                                      </ReferenceProvider>
+                                    </PersonalSummaryProvider>
+                                  </PersonalInfoProvider>
+                                </LanguageProvider>
+                              </FirstImpressionProvider>
+                            </InterestProvider>
+                          </ExperienceProvider>
+                        </EmployHistoryProvider>
+                      </ContactInfoProvider>
+                    </AttributeProvider>
+                  </PublicCVProvider>
                 </ShareCVProvider>
               </AffiliateProvider>
             </BurgerMenuProvider>

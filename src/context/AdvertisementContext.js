@@ -1,3 +1,4 @@
+import ngrokApi from '../api/ngrok'
 import createDataContext from './createDataContext'
 
 // Reducer
@@ -11,6 +12,13 @@ const AdvertisementReducer = (state, action) => {
       return { ...state, bannerAdFullShow: action.payload }
     case 'SET_BANNER_AD_STRIP_SHOW':
       return { ...state, bannerAdStripShow: action.payload }
+    case 'FETCH_SETTINGS':
+      return {
+        ...state,
+        bannerAdStripShow: action.payload.bannerAdStripShow,
+        bannerAdFullShow: action.payload.bannerAdFullShow,
+        settingsLoaded: true,
+      }
     default:
       return state
   }
@@ -33,6 +41,17 @@ const setBannerAdStripShow = (dispatch) => (data) => {
   dispatch({ type: 'SET_BANNER_AD_STRIP_SHOW', payload: data })
 }
 
+// Fetch system settings from the server
+const fetchSystemSettings = (dispatch) => async () => {
+  try {
+    const response = await ngrokApi.get('/api/system-settings')
+    dispatch({ type: 'FETCH_SETTINGS', payload: response.data })
+  } catch (error) {
+    console.error('Error fetching system settings:', error)
+    // Keep default settings on error
+  }
+}
+
 export const { Provider, Context } = createDataContext(
   AdvertisementReducer,
   {
@@ -40,11 +59,13 @@ export const { Provider, Context } = createDataContext(
     setBannerAdFullSelected,
     setBannerAdFullShow,
     setBannerAdStripShow,
+    fetchSystemSettings,
   },
   {
     bannerAdStripSelected: 'bannerAdStrip1',
     bannerAdFullSelected: 'bannerAdFull1',
     bannerAdFullShow: true,
     bannerAdStripShow: true,
+    settingsLoaded: false,
   }
 )

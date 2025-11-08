@@ -69,7 +69,7 @@ const PhotoBitButton = () => {
       return <View style={styles.statusBed}>{renderStatusLoader()}</View>
     return (
       <View style={styles.statusBed}>
-        {photoStatus === '0' ? (
+        {photoStatus === 0 ? (
           <>
             <Text style={styles.percentage}>
               <Feather name="circle" size={24} />

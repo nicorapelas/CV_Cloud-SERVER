@@ -153,7 +153,7 @@ const AttributeCreateForm = ({ bit }) => {
                 Keyboard.dismiss()
               }}
             >
-              <AntDesign name="caretdown" style={styles.addButtonIcon} />
+              <MaterialIcons name="check-circle" style={styles.addButtonIcon} />
               <Text
                 style={
                   userPlanformOS === 'ios'

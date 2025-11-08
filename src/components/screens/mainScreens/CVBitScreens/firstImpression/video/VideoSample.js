@@ -1,14 +1,13 @@
-import React, { useContext, useEffect, useState, useRef } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import { AntDesign } from '@expo/vector-icons'
-import { Video } from 'expo-av'
+import { AntDesign, MaterialIcons } from '@expo/vector-icons'
+import { VideoView, useVideoPlayer } from 'expo-video'
 
 import LoaderFullScreen from '../../../../../common/LoaderFullScreen'
 import { Context as FirstImpressionContext } from '../../../../../../context/FirstImpressionContext'
 
 const VideoSample = () => {
-  const video = useRef(null)
-  const [status, setStatus] = useState({})
+  const [isPlaying, setIsPlaying] = useState(false)
 
   const {
     state: { loading, videoDemoUrl },
@@ -16,46 +15,65 @@ const VideoSample = () => {
     fetchDemoVideoUrl,
   } = useContext(FirstImpressionContext)
 
+  const player = useVideoPlayer(
+    videoDemoUrl?.url ? { uri: videoDemoUrl.url } : undefined
+  )
+
   useEffect(() => {
     fetchDemoVideoUrl()
   }, [])
+
+  useEffect(() => {
+    if (videoDemoUrl?.url && player) {
+      player.replaceAsync({ uri: videoDemoUrl.url }).then(() => {
+        player.loop = true
+      })
+    }
+  }, [videoDemoUrl?.url])
+
+  useEffect(() => {
+    if (!player) return
+
+    const subscription = player.addListener('playingChange', (newIsPlaying) => {
+      setIsPlaying(newIsPlaying)
+    })
+
+    return () => {
+      subscription.remove()
+    }
+  }, [player])
 
   const renderContent = () => {
     if (loading) return <LoaderFullScreen />
     if (!videoDemoUrl) return null
     return (
       <View style={styles.videoBed}>
-        <Video
-          ref={video}
+        <VideoView
+          player={player}
           style={styles.video}
-          source={{
-            uri: videoDemoUrl.url,
-          }}
-          useNativeControls
-          resizeMode="contain"
-          onPlaybackStatusUpdate={(status) => setStatus(() => status)}
-          isLooping="true"
+          nativeControls
+          contentFit="contain"
+          fullscreenOptions={{ enterFullscreenButtonVisible: true }}
         />
         <View style={styles.buttonsBed}>
           <TouchableOpacity
             style={styles.playButton}
-            onPress={() =>
-              status.isPlaying
-                ? video.current.pauseAsync()
-                : video.current.playAsync()
-            }
+            onPress={() => (isPlaying ? player.pause() : player.play())}
           >
-            {status.isPlaying ? (
-              <AntDesign name="pausecircle" style={styles.playButtonIcon} />
+            {isPlaying ? (
+              <MaterialIcons
+                name="pause-circle"
+                style={styles.playButtonIcon}
+              />
             ) : (
-              <AntDesign name="play" style={styles.playButtonIcon} />
+              <MaterialIcons name="play-circle" style={styles.playButtonIcon} />
             )}
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.backButton}
             onPress={() => setVideoDemoShow(false)}
           >
-            <AntDesign style={styles.backButtonIcon} name="closecircle" />
+            <MaterialIcons style={styles.backButtonIcon} name="cancel" />
             <Text style={styles.backButtonText}>close</Text>
           </TouchableOpacity>
         </View>

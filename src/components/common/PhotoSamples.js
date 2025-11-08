@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react'
 import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native'
-import { AntDesign } from '@expo/vector-icons'
+import { AntDesign, MaterialIcons } from '@expo/vector-icons'
 import { Context as UniversalContext } from '../../context/UniversalContext'
 
 import photo001 from '../../../assets/portraitPhotos/photo006-200.png'
@@ -108,7 +108,7 @@ const PhotoSamples = () => {
           style={styles.backButton}
           onPress={() => setPhotoSampleViewShow(false)}
         >
-          <AntDesign style={styles.backButtonIcon} name="closecircle" />
+          <MaterialIcons style={styles.backButtonIcon} name="cancel" />
           <Text style={styles.backButtonText}>close</Text>
         </TouchableOpacity>
       </View>

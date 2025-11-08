@@ -11,6 +11,7 @@ import {
 import {
   AntDesign,
   MaterialCommunityIcons,
+  MaterialIcons,
   FontAwesome,
 } from '@expo/vector-icons'
 
@@ -92,7 +93,7 @@ const CertificateScreen = () => {
               <View style={styles.container}>
                 <View>
                   {!item.pdfUrl ? null : (
-                    <AntDesign name="pdffile1" style={styles.pdfIcon} />
+                    <MaterialIcons name="picture-as-pdf" style={styles.pdfIcon} />
                   )}
                   {!item.photoUrl ? null : (
                     <Image

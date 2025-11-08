@@ -13,20 +13,29 @@ import {
 } from 'react-native'
 import { CheckBox } from 'react-native-elements'
 import { useKeyboard } from '@react-native-community/hooks'
-import { MaterialCommunityIcons, AntDesign, Ionicons } from '@expo/vector-icons'
+import {
+  MaterialCommunityIcons,
+  AntDesign,
+  Ionicons,
+  MaterialIcons,
+} from '@expo/vector-icons'
 import uuid from 'uuid/v4'
 
 import FormHintModal from '../../../common/modals/FormHintModal'
 import validateEmailInput from '../../../../validation/email'
 import FormCancelButton from '../../../common/FormCancelButton'
+import LoaderFullScreen from '../../../common/LoaderFullScreen'
 import { Context as ShareCVContext } from '../../../../context/ShareCVContext'
 import { Context as PhotoContext } from '../../../../context/PhotoContext'
+import { Context as PersonalInfoContext } from '../../../../context/PersonalInfoContext'
 import { Context as UniversalContext } from '../../../../context/UniversalContext'
 import { Context as NavContext } from '../../../../context/NavContext'
 
 const ShareCVForm = () => {
-  const [subject, setSubject] = useState(null)
-  const [message, setMessage] = useState(null)
+  const [subject, setSubject] = useState(
+    'CV Application - Professional Opportunity'
+  )
+  const [message, setMessage] = useState('')
   const [email, setEmail] = useState(null)
   const [sentMessage, setSentMessage] = useState(false)
 
@@ -50,7 +59,12 @@ const ShareCVForm = () => {
   } = useContext(PhotoContext)
 
   const {
-    state: { error },
+    state: { personalInfo },
+    fetchPersonalInfo,
+  } = useContext(PersonalInfoContext)
+
+  const {
+    state: { error, loading },
     createShareCV,
     clearShareCVErrors,
     addError,
@@ -61,7 +75,31 @@ const ShareCVForm = () => {
   useEffect(() => {
     fetchAssignedPhoto()
     fetchCV_ID()
+    fetchPersonalInfo()
   }, [])
+
+  // Update subject line and message when personal info loads
+  useEffect(() => {
+    if (personalInfo && personalInfo.fullName) {
+      const fullName = personalInfo.fullName
+      const defaultMessage = `Dear Hiring Manager,
+
+I am writing to express my interest in potential opportunities within your organization. Please find my CV attached for your review.
+
+I would welcome the opportunity to discuss how my skills and experience could contribute to your team.
+
+Thank you for your consideration.
+
+Best regards,
+${fullName}`
+
+      setSubject(`CV Application - ${fullName}`)
+      // Only set default message if user hasn't typed anything yet
+      if (message === '') {
+        setMessage(defaultMessage)
+      }
+    }
+  }, [personalInfo])
 
   useEffect(() => {
     if (!photos || photos.length < 1) {
@@ -75,15 +113,35 @@ const ShareCVForm = () => {
     if (sentMessage) {
       const timer = setTimeout(() => {
         setSentMessage(false)
-        setSubject(null)
-        setMessage(null)
+        // Reset to default values (will be updated by personalInfo effect)
+        const fullName = personalInfo?.fullName || ''
+        setSubject(
+          fullName
+            ? `CV Application - ${fullName}`
+            : 'CV Application - Professional Opportunity'
+        )
+        if (fullName) {
+          const defaultMessage = `Dear Hiring Manager,
+
+I am writing to express my interest in potential opportunities within your organization. Please find my CV attached for your review.
+
+I would welcome the opportunity to discuss how my skills and experience could contribute to your team.
+
+Thank you for your consideration.
+
+Best regards,
+${fullName}`
+          setMessage(defaultMessage)
+        } else {
+          setMessage('')
+        }
         setEmail(null)
         setCVBitScreenSelected('')
         setNavTabSelected('dashboard')
       }, 3000)
       return () => clearTimeout(timer)
     }
-  }, [sentMessage])
+  }, [sentMessage, personalInfo])
 
   const keyboard = useKeyboard()
 
@@ -124,15 +182,35 @@ const ShareCVForm = () => {
           <TouchableOpacity
             onPress={() => {
               setSentMessage(false)
-              setSubject(null)
-              setMessage(null)
+              // Reset to default values
+              const fullName = personalInfo?.fullName || ''
+              setSubject(
+                fullName
+                  ? `CV Application - ${fullName}`
+                  : 'CV Application - Professional Opportunity'
+              )
+              if (fullName) {
+                const defaultMessage = `Dear Hiring Manager,
+
+I am writing to express my interest in potential opportunities within your organization. Please find my CV attached for your review.
+
+I would welcome the opportunity to discuss how my skills and experience could contribute to your team.
+
+Thank you for your consideration.
+
+Best regards,
+${fullName}`
+                setMessage(defaultMessage)
+              } else {
+                setMessage('')
+              }
               setEmail(null)
               setCVBitScreenSelected('')
               setNavTabSelected('dashboard')
             }}
             style={styles.sentMessageButton}
           >
-            <AntDesign name="checkcircle" style={styles.sentMessageIcon} />
+            <MaterialIcons name="check-circle" style={styles.sentMessageIcon} />
           </TouchableOpacity>
         </View>
       </View>
@@ -352,7 +430,6 @@ const ShareCVForm = () => {
           textAlign="center"
           placeholder="recipients email address"
           value={email}
-          onFocus={clearShareCVErrors}
           autoFocus={!error ? true : false}
           onChangeText={setEmail}
           autoCorrect={false}
@@ -424,7 +501,7 @@ const ShareCVForm = () => {
                 Keyboard.dismiss()
               }}
             >
-              <AntDesign name="caretdown" style={styles.addButtonIcon} />
+              <MaterialIcons name="check-circle" style={styles.addButtonIcon} />
               <Text
                 style={
                   Platform.OS === 'ios'
@@ -625,8 +702,28 @@ const ShareCVForm = () => {
             toggleHideNavLinks(true)
             createShareCV(formValues, () => {
               setSentMessage(true)
-              setSubject(null)
-              setMessage(null)
+              // Reset to default values
+              const fullName = personalInfo?.fullName || ''
+              setSubject(
+                fullName
+                  ? `CV Application - ${fullName}`
+                  : 'CV Application - Professional Opportunity'
+              )
+              if (fullName) {
+                const defaultMessage = `Dear Hiring Manager,
+
+I am writing to express my interest in potential opportunities within your organization. Please find my CV attached for your review.
+
+I would welcome the opportunity to discuss how my skills and experience could contribute to your team.
+
+Thank you for your consideration.
+
+Best regards,
+${fullName}`
+                setMessage(defaultMessage)
+              } else {
+                setMessage('')
+              }
               setEmail(null)
               toggleHideNavLinks(false)
             })
@@ -661,6 +758,9 @@ const ShareCVForm = () => {
   }
 
   const renderContent = () => {
+    if (loading) {
+      return <LoaderFullScreen />
+    }
     return (
       <KeyboardAvoidingView
         style={

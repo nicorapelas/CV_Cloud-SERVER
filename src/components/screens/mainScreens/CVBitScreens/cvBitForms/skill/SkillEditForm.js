@@ -44,7 +44,6 @@ const SkillEditForm = () => {
 
   useEffect(() => {
     if (skillToEdit) {
-      console.log(skillToEdit)
       const { skill, proficiency } = skillToEdit
       setSkill(skill)
       setProficiency(proficiency)

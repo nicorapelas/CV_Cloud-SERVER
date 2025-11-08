@@ -5,6 +5,7 @@ import {
   Octicons,
   FontAwesome5,
   AntDesign,
+  MaterialIcons,
 } from '@expo/vector-icons'
 
 import { Context as UniversalContext } from '../../../context/UniversalContext'
@@ -372,7 +373,7 @@ const FormHintModal = ({ bit }) => {
                 style={styles.backButton}
                 onPress={() => setModalVisible(false)}
               >
-                <AntDesign name="closecircle" style={styles.backButtonIcon} />
+                <MaterialIcons name="cancel" style={styles.backButtonIcon} />
                 <Text style={styles.backButtonText}>close</Text>
               </TouchableOpacity>
             )}

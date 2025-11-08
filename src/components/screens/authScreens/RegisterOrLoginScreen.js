@@ -126,7 +126,7 @@ const RegisterOrLoginScreen = ({ navigation }) => {
                   style={styles.button}
                   onPress={handlePressSignup}
                 >
-                  <AntDesign style={styles.buttonIcon} name="adduser" />
+                  <AntDesign style={styles.buttonIcon} name="user" />
                   <Text style={styles.buttonText}>Sign up with us</Text>
                 </TouchableOpacity>
                 <Text

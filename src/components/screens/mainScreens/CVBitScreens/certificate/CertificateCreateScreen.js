@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import { AntDesign, Ionicons } from '@expo/vector-icons'
+import { AntDesign, Ionicons, MaterialIcons } from '@expo/vector-icons'
 
 import LoaderFullScreen from '../../../../common/LoaderFullScreen'
 import { Context as CertificateContext } from '../../../../../context/CertificateContext'
@@ -41,7 +41,7 @@ const CertificateCreateScreen = () => {
           style={styles.inistructionLink}
           onPress={() => toggleInstructionModal(true)}
         >
-          <AntDesign name="infocirlce" style={styles.inistructionLinkIcon} />
+          <MaterialIcons name="info" style={styles.inistructionLinkIcon} />
           <Text style={styles.inistructionLinkText}>
             PDF capture instructions
           </Text>

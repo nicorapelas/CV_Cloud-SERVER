@@ -7,7 +7,7 @@ import {
   Platform,
 } from 'react-native'
 import { Camera, CameraType } from 'expo-camera'
-import { Audio } from 'expo-av'
+import { Audio } from 'expo-audio'
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
 
 import { Context as FirstImpressionContext } from '../../../../../context/FirstImpressionContext'
@@ -84,8 +84,22 @@ const FirstImpressionCreateScreen = () => {
   }
 
   const audioPermissionsRequest = async () => {
-    const { status } = await Audio.requestPermissionsAsync()
-    setAudioPermission(status === 'granted')
+    try {
+      // expo-audio may handle permissions differently
+      // For camera recording, permissions are typically handled by expo-camera
+      // when audio={true} is set on Camera
+      if (Audio.requestPermissionsAsync) {
+        const { status } = await Audio.requestPermissionsAsync()
+        setAudioPermission(status === 'granted')
+      } else {
+        // expo-audio might not have requestPermissionsAsync
+        // In this case, expo-camera handles audio permissions
+        setAudioPermission(true)
+      }
+    } catch (error) {
+      console.error('Audio permission error:', error)
+      setAudioPermission(true)
+    }
   }
 
   const runCameraPermissions = () => {

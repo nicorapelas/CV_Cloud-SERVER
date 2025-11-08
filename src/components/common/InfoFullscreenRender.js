@@ -6,6 +6,7 @@ import TermsAndConditionsText from './burgerMenu/TermsAndConditionsText'
 import SignOutConfirm from './burgerMenu/SignOutConfirm'
 import DeleteAccountConfirm from './burgerMenu/DeleteAcountConfirm'
 import ManagmentMenu from './burgerMenu/managment/ManagmentMenu'
+import AdminPanelScreen from '../screens/admin/AdminPanelScreen'
 import { Context as BurgerMenuContext } from '../../context/BurgerMenuContext'
 
 const InfoFullscreenRender = () => {
@@ -32,6 +33,8 @@ const InfoFullscreenRender = () => {
         return <DeleteAccountConfirm />
       case 'managment':
         return <ManagmentMenu />
+      case 'adminPanel':
+        return <AdminPanelScreen />
       default:
         break
     }

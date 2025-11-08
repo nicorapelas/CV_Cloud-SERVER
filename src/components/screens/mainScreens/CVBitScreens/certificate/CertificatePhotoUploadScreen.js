@@ -83,7 +83,6 @@ const CertificatePhotoUploadScreen = () => {
       )
       return resizedImage
     } catch (error) {
-      console.log('Image processing error:', error)
       // If processing fails, return original URI
       return { uri }
     }
