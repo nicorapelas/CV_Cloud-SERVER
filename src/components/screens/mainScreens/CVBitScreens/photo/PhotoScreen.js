@@ -52,6 +52,11 @@ const PhotoScreen = () => {
   // Handle real-time updates
   useEffect(() => {
     if (lastUpdate && lastUpdate.dataType === 'photo') {
+      // Skip if we're currently assigning a photo (local operation)
+      if (photoAssignLoading || loading) {
+        return
+      }
+
       const now = Date.now()
       if (
         lastRefreshTimestamp.current &&
@@ -65,7 +70,7 @@ const PhotoScreen = () => {
         fetchPhotos()
       }, 500)
     }
-  }, [lastUpdate, fetchPhotos])
+  }, [lastUpdate, fetchPhotos, photoAssignLoading, loading])
 
   const handlePressUsePhoto = (data) => {
     setPhotoSelected(data._id)

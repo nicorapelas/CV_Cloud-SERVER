@@ -16,7 +16,7 @@ const PhotoBitButton = () => {
   const [counter, setCounter] = useState(0)
 
   const {
-    state: { loading, photoStatus, photos, photoStatusInitFetchDone },
+    state: { loading, photoStatus, photos, photoStatusInitFetchDone, photoAssignLoading },
     fetchPhotoStatus,
     fetchPhotos,
     assignPhoto,
@@ -49,6 +49,11 @@ const PhotoBitButton = () => {
   // Handle real-time updates
   useEffect(() => {
     if (lastUpdate && lastUpdate.dataType === 'photo') {
+      // Skip if we're currently assigning a photo (local operation)
+      if (photoAssignLoading || loading) {
+        return
+      }
+
       const now = Date.now()
       if (
         lastRefreshTimestamp.current &&
@@ -60,10 +65,9 @@ const PhotoBitButton = () => {
       lastRefreshTimestamp.current = now
       setTimeout(() => {
         fetchPhotoStatus()
-        fetchPhotos()
       }, 500)
     }
-  }, [lastUpdate, fetchPhotoStatus, fetchPhotos])
+  }, [lastUpdate, fetchPhotoStatus, photoAssignLoading, loading])
 
   const autoAssignPhoto = () => {
     if (!photos || photos.length < 1) {
