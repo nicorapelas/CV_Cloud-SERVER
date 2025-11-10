@@ -18,6 +18,7 @@ const PhotoBitButton = () => {
   const {
     state: { loading, photoStatus, photos, photoStatusInitFetchDone },
     fetchPhotoStatus,
+    fetchPhotos,
     assignPhoto,
     setPhotoStatusInitFetchDone,
   } = useContext(PhotoContext)
@@ -59,9 +60,10 @@ const PhotoBitButton = () => {
       lastRefreshTimestamp.current = now
       setTimeout(() => {
         fetchPhotoStatus()
+        fetchPhotos()
       }, 500)
     }
-  }, [lastUpdate, fetchPhotoStatus])
+  }, [lastUpdate, fetchPhotoStatus, fetchPhotos])
 
   const autoAssignPhoto = () => {
     if (!photos || photos.length < 1) {

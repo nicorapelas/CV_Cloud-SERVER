@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useState, useEffect, useRef } from 'react'
 import {
   View,
   StyleSheet,
@@ -17,6 +17,7 @@ import DeleteModal from '../../../../common/modals/DeleteModal'
 import { Context as PhotoContext } from '../../../../../context/PhotoContext'
 import { Context as UniversalContext } from '../../../../../context/UniversalContext'
 import { Context as NavContext } from '../../../../../context/NavContext'
+import { useRealTime } from '../../../../../context/RealTimeContext'
 
 const PhotoScreen = () => {
   const [photoSelected, setPhotoSelected] = useState(null)
@@ -31,9 +32,13 @@ const PhotoScreen = () => {
   const {
     state: { loading, photos, photoAssignLoading },
     assignPhoto,
+    fetchPhotos,
     setPhotoToEdit,
     setAssignedPhotoId,
   } = useContext(PhotoContext)
+
+  const { lastUpdate } = useRealTime()
+  const lastRefreshTimestamp = useRef(null)
   
   useEffect(() => {
     if (photos && photos.length > 0) {
@@ -43,6 +48,24 @@ const PhotoScreen = () => {
       setAssignedPhotoId(photoAssigned[0]._id)
     }
   }, [photos])
+
+  // Handle real-time updates
+  useEffect(() => {
+    if (lastUpdate && lastUpdate.dataType === 'photo') {
+      const now = Date.now()
+      if (
+        lastRefreshTimestamp.current &&
+        now - lastRefreshTimestamp.current < 2000
+      ) {
+        return
+      }
+
+      lastRefreshTimestamp.current = now
+      setTimeout(() => {
+        fetchPhotos()
+      }, 500)
+    }
+  }, [lastUpdate, fetchPhotos])
 
   const handlePressUsePhoto = (data) => {
     setPhotoSelected(data._id)
