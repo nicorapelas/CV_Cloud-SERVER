@@ -12,7 +12,7 @@ const NotificationBell = ({ onPress }) => {
       onPress={onPress}
       activeOpacity={0.7}
     >
-      <Ionicons name="notifications-outline" size={24} color="#333" />
+      <Ionicons name="notifications-outline" size={24} color="#fff" />
       {unreadCount > 0 && (
         <View style={styles.badge}>
           <Text style={styles.badgeText}>
