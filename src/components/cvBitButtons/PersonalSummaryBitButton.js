@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useRef } from 'react'
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import { Feather, Octicons } from '@expo/vector-icons'
 
 import { Context as PersonalSummaryContext } from '../../context/PersonalSummaryContext'
 import { Context as NavContext } from '../../context/NavContext'
+import { useRealTime } from '../../context/RealTimeContext'
 
 const PersonalSummaryBitButton = () => {
   const {
@@ -19,6 +20,8 @@ const PersonalSummaryBitButton = () => {
   } = useContext(PersonalSummaryContext)
 
   const { setCVBitScreenSelected } = useContext(NavContext)
+  const { lastUpdate } = useRealTime()
+  const lastRefreshTimestamp = useRef(null)
 
   useEffect(() => {
     if (!personalSummaryStatusFetchDone) {
@@ -26,6 +29,24 @@ const PersonalSummaryBitButton = () => {
       setPersonalSummaryStatusFetchDone(true)
     }
   }, [personalSummaryStatusFetchDone])
+
+  // Handle real-time updates
+  useEffect(() => {
+    if (lastUpdate && lastUpdate.dataType === 'personal-summary') {
+      const now = Date.now()
+      if (
+        lastRefreshTimestamp.current &&
+        now - lastRefreshTimestamp.current < 2000
+      ) {
+        return
+      }
+
+      lastRefreshTimestamp.current = now
+      setTimeout(() => {
+        fetchPersonalSummaryStatus()
+      }, 500)
+    }
+  }, [lastUpdate])
 
   const renderStatusLoader = () => {
     return <ActivityIndicator size="small" color="#ededed" />

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useRef } from 'react'
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import { Octicons } from '@expo/vector-icons'
 
 import { Context as AttributeContext } from '../../context/AttributeContext'
 import { Context as NavContext } from '../../context/NavContext'
+import { useRealTime } from '../../context/RealTimeContext'
 
 const AttributeBitButton = () => {
   const {
@@ -19,6 +20,8 @@ const AttributeBitButton = () => {
   } = useContext(AttributeContext)
 
   const { setCVBitScreenSelected } = useContext(NavContext)
+  const { lastUpdate } = useRealTime()
+  const lastRefreshTimestamp = useRef(null)
 
   useEffect(() => {
     if (!attributeStatusInitFetchDone) {
@@ -26,6 +29,24 @@ const AttributeBitButton = () => {
       setAttributeStatusInitFetchDone(true)
     }
   }, [attributeStatusInitFetchDone])
+
+  // Handle real-time updates
+  useEffect(() => {
+    if (lastUpdate && lastUpdate.dataType === 'attribute') {
+      const now = Date.now()
+      if (
+        lastRefreshTimestamp.current &&
+        now - lastRefreshTimestamp.current < 2000
+      ) {
+        return
+      }
+
+      lastRefreshTimestamp.current = now
+      setTimeout(() => {
+        fetchAttributeStatus()
+      }, 500)
+    }
+  }, [lastUpdate])
 
   const renderStatusLoader = () => {
     return <ActivityIndicator size="small" color="#ededed" />

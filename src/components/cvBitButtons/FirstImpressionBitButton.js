@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react'
+import React, { useState, useContext, useEffect, useRef } from 'react'
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import { Feather, Octicons } from '@expo/vector-icons'
 
 import { Context as FirstImpressionContext } from '../../context/FirstImpressionContext'
 import { Context as NavContext } from '../../context/NavContext'
+import { useRealTime } from '../../context/RealTimeContext'
 
 const FirstImpressionBitButton = () => {
   const [counter, setCounter] = useState(0)
@@ -21,6 +22,8 @@ const FirstImpressionBitButton = () => {
   } = useContext(FirstImpressionContext)
 
   const { setCVBitScreenSelected } = useContext(NavContext)
+  const { lastUpdate } = useRealTime()
+  const lastRefreshTimestamp = useRef(null)
 
   useEffect(() => {
     if (!firstImpressionStatusInitFetchDone) {
@@ -28,6 +31,24 @@ const FirstImpressionBitButton = () => {
       setFirstImpressionStatusInitFetchDone(true)
     }
   }, [firstImpressionStatusInitFetchDone])
+
+  // Handle real-time updates
+  useEffect(() => {
+    if (lastUpdate && lastUpdate.dataType === 'first-impression') {
+      const now = Date.now()
+      if (
+        lastRefreshTimestamp.current &&
+        now - lastRefreshTimestamp.current < 2000
+      ) {
+        return
+      }
+
+      lastRefreshTimestamp.current = now
+      setTimeout(() => {
+        fetchFirsImpressionStatus()
+      }, 500)
+    }
+  }, [lastUpdate])
 
   useEffect(() => {
     if (firstImpression && counter < 2) {

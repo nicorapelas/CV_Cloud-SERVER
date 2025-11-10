@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useRef } from 'react'
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import { Octicons, Feather } from '@expo/vector-icons'
 
 import { Context as SecondEduContext } from '../../context/SecondEduContext'
 import { Context as NavContext } from '../../context/NavContext'
+import { useRealTime } from '../../context/RealTimeContext'
 
 const SecondEduBitButton = () => {
   const {
@@ -19,6 +20,8 @@ const SecondEduBitButton = () => {
   } = useContext(SecondEduContext)
 
   const { setCVBitScreenSelected } = useContext(NavContext)
+  const { lastUpdate } = useRealTime()
+  const lastRefreshTimestamp = useRef(null)
 
   useEffect(() => {
     if (!secondEduStatusInitFetchDone) {
@@ -26,6 +29,24 @@ const SecondEduBitButton = () => {
       setSecondEduStatusInitFetchDone(true)
     }
   }, [secondEduStatusInitFetchDone])
+
+  // Handle real-time updates
+  useEffect(() => {
+    if (lastUpdate && lastUpdate.dataType === 'second-edu') {
+      const now = Date.now()
+      if (
+        lastRefreshTimestamp.current &&
+        now - lastRefreshTimestamp.current < 2000
+      ) {
+        return
+      }
+
+      lastRefreshTimestamp.current = now
+      setTimeout(() => {
+        fetchSecondEduStatus()
+      }, 500)
+    }
+  }, [lastUpdate])
 
   const renderStatusLoader = () => {
     return <ActivityIndicator size="small" color="#ededed" />

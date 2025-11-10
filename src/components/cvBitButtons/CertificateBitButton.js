@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react'
+import React, { useState, useContext, useEffect, useRef } from 'react'
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import { Feather, Octicons } from '@expo/vector-icons'
 
 import { Context as CertificateContext } from '../../context/CertificateContext'
 import { Context as NavContext } from '../../context/NavContext'
+import { useRealTime } from '../../context/RealTimeContext'
 
 const CertificateBitButton = () => {
   const [counter, setCounter] = useState(0)
@@ -21,6 +22,8 @@ const CertificateBitButton = () => {
   } = useContext(CertificateContext)
 
   const { setCVBitScreenSelected } = useContext(NavContext)
+  const { lastUpdate } = useRealTime()
+  const lastRefreshTimestamp = useRef(null)
 
   useEffect(() => {
     if (!certificateStatusInitFetchDone) {
@@ -28,6 +31,24 @@ const CertificateBitButton = () => {
       setCertificateInitStatusFetchDone(true)
     }
   }, [certificateStatusInitFetchDone])
+
+  // Handle real-time updates
+  useEffect(() => {
+    if (lastUpdate && lastUpdate.dataType === 'certificate') {
+      const now = Date.now()
+      if (
+        lastRefreshTimestamp.current &&
+        now - lastRefreshTimestamp.current < 2000
+      ) {
+        return
+      }
+
+      lastRefreshTimestamp.current = now
+      setTimeout(() => {
+        fetchCertificateStatus()
+      }, 500)
+    }
+  }, [lastUpdate])
 
   useEffect(() => {
     if (certificates && counter < 2) {

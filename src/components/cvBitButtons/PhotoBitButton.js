@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react'
+import React, { useState, useContext, useEffect, useRef } from 'react'
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import { Feather, Octicons } from '@expo/vector-icons'
 
 import { Context as PhotoContext } from '../../context/PhotoContext'
 import { Context as NavContext } from '../../context/NavContext'
+import { useRealTime } from '../../context/RealTimeContext'
 
 const PhotoBitButton = () => {
   const [counter, setCounter] = useState(0)
@@ -22,6 +23,8 @@ const PhotoBitButton = () => {
   } = useContext(PhotoContext)
 
   const { setCVBitScreenSelected } = useContext(NavContext)
+  const { lastUpdate } = useRealTime()
+  const lastRefreshTimestamp = useRef(null)
 
   useEffect(() => {
     if (!photoStatusInitFetchDone) {
@@ -41,6 +44,24 @@ const PhotoBitButton = () => {
       autoAssignPhoto()
     }
   }, [counter])
+
+  // Handle real-time updates
+  useEffect(() => {
+    if (lastUpdate && lastUpdate.dataType === 'photo') {
+      const now = Date.now()
+      if (
+        lastRefreshTimestamp.current &&
+        now - lastRefreshTimestamp.current < 2000
+      ) {
+        return
+      }
+
+      lastRefreshTimestamp.current = now
+      setTimeout(() => {
+        fetchPhotoStatus()
+      }, 500)
+    }
+  }, [lastUpdate])
 
   const autoAssignPhoto = () => {
     if (!photos || photos.length < 1) {

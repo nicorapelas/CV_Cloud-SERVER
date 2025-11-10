@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useRef } from 'react'
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import { Octicons } from '@expo/vector-icons'
 
 import { Context as SkillContext } from '../../context/SkillContext'
 import { Context as NavContext } from '../../context/NavContext'
+import { useRealTime } from '../../context/RealTimeContext'
 
 const SkillBitButton = () => {
   const {
@@ -19,6 +20,8 @@ const SkillBitButton = () => {
   } = useContext(SkillContext)
 
   const { setCVBitScreenSelected } = useContext(NavContext)
+  const { lastUpdate } = useRealTime()
+  const lastRefreshTimestamp = useRef(null)
 
   useEffect(() => {
     if (!skillStatusInitFetchDone) {
@@ -26,6 +29,24 @@ const SkillBitButton = () => {
       setSkillStatusInitFetchDone(true)
     }
   }, [skillStatusInitFetchDone])
+
+  // Handle real-time updates
+  useEffect(() => {
+    if (lastUpdate && lastUpdate.dataType === 'skill') {
+      const now = Date.now()
+      if (
+        lastRefreshTimestamp.current &&
+        now - lastRefreshTimestamp.current < 2000
+      ) {
+        return
+      }
+
+      lastRefreshTimestamp.current = now
+      setTimeout(() => {
+        fetchSkillStatus()
+      }, 500)
+    }
+  }, [lastUpdate])
 
   const renderStatusLoader = () => {
     return <ActivityIndicator size="small" color="#ededed" />
