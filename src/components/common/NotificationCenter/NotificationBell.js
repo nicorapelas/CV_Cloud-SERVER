@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
   container: {
     position: 'relative',
     padding: 8,
-    marginRight: 8,
+    marginRight: 4,
   },
   badge: {
     position: 'absolute',
