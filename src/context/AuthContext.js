@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import * as Updates from 'expo-updates'
 
 import ngrokApi from '../api/ngrok'
 import createDataContext from './createDataContext'
@@ -165,12 +164,11 @@ const login =
   }
 
 const signout = (dispatch) => async () => {
-  await AsyncStorage.removeItem('token')
-  dispatch({ type: 'SIGN_OUT' })
   try {
-    await Updates.reloadAsync() // This will reload your app
+    await AsyncStorage.removeItem('token')
+    dispatch({ type: 'SIGN_OUT' })
   } catch (e) {
-    console.error('Error restarting the app:', e)
+    console.error('Error during signout:', e)
   }
 }
 
