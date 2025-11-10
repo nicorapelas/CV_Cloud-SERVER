@@ -54,8 +54,11 @@ export const RealTimeProvider = ({ children }) => {
 
     // Setup event listeners
     const handleDataUpdate = (data) => {
+      console.log('📨 Data update received:', data)
+      
       // Check if this is a duplicate update (same timestamp)
       if (lastProcessedTimestamp.current === data.timestamp) {
+        console.log('🔄 Ignoring duplicate update')
         return
       }
 
@@ -64,10 +67,30 @@ export const RealTimeProvider = ({ children }) => {
         lastProcessedTimestamp.current &&
         data.timestamp < lastProcessedTimestamp.current
       ) {
+        console.log('🔄 Ignoring old update')
         return
       }
 
-      // This is a new update, process it
+      // Only process updates for the current user
+      if (user && user._id && data.userId && data.userId !== user._id) {
+        console.log('🔄 Ignoring update for different user:', data.userId, 'Current user:', user._id)
+        return
+      }
+
+      // Don't process updates if no user is logged in
+      if (!user || !user._id) {
+        console.log('🔄 Ignoring update - no user logged in')
+        return
+      }
+
+      // Don't process updates if they don't have a userId
+      if (!data.userId) {
+        console.log('🔄 Ignoring update - no userId in data')
+        return
+      }
+
+      // This is a new update for the current user, process it
+      console.log('✅ Processing update:', data.dataType)
       lastProcessedTimestamp.current = data.timestamp
       setLastUpdate(data)
       setUpdateHistory((prev) => [...prev.slice(-9), data]) // Keep last 10 updates
@@ -104,7 +127,7 @@ export const RealTimeProvider = ({ children }) => {
       socketService.removeEventListener('notification', handleNotification)
       clearInterval(statusInterval)
     }
-  }, [])
+  }, [user]) // Add user dependency so handlers update when user changes
 
   /**
    * Automatically set up real-time connection when user is authenticated
@@ -117,8 +140,10 @@ export const RealTimeProvider = ({ children }) => {
 
       // Send user activity
       socketService.sendUserActivity(user._id)
+      console.log('🔐 Mobile user authenticated:', user._id)
     } else if (user === null) {
       setConnectionStatus((prev) => ({ ...prev, userId: null }))
+      console.log('🔓 User logged out, clearing socket auth')
     }
   }, [user])
 

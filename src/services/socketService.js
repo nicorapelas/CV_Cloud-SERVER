@@ -103,7 +103,7 @@ class SocketService {
     if (!this.socket || !userId) return;
 
     this.userId = userId;
-    this.socket.emit('authenticate', { userId });
+    this.socket.emit('authenticate', userId);  // Send userId directly, not as object
     console.log('🔐 Authenticated with userId:', userId);
   }
 
@@ -112,7 +112,7 @@ class SocketService {
    */
   sendUserActivity(userId) {
     if (!this.socket || !userId) return;
-    this.socket.emit('user-activity', { userId, timestamp: Date.now() });
+    this.socket.emit('user-activity', userId);  // Send userId directly, not as object
   }
 
   /**
