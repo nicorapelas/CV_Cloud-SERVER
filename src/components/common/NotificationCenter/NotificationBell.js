@@ -29,6 +29,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     padding: 8,
     marginRight: 4,
+    alignSelf: 'flex-end',
   },
   badge: {
     position: 'absolute',
