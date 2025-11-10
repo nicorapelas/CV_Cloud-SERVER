@@ -61,7 +61,7 @@ const PhotoBitButton = () => {
         fetchPhotoStatus()
       }, 500)
     }
-  }, [lastUpdate])
+  }, [lastUpdate, fetchPhotoStatus])
 
   const autoAssignPhoto = () => {
     if (!photos || photos.length < 1) {
