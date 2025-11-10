@@ -14,6 +14,7 @@ import { Context as AdvertisementContext } from '../../../context/AdvertisementC
 import { Context as NavContext } from '../../../context/NavContext'
 import { Context as UniversalContext } from '../../../context/UniversalContext'
 import { Context as FirstImpressionContext } from '../../../context/FirstImpressionContext'
+import { useNotifications } from '../../../context/NotificationContext'
 
 const Main = () => {
   const [showHeader, setShowHeader] = useState(true)
@@ -46,6 +47,8 @@ const Main = () => {
     state: { firstImpression, videoUploading },
   } = useContext(FirstImpressionContext)
 
+  const { fetchNotifications } = useNotifications()
+
   useEffect(() => {
     if (!user) {
       const timer = setTimeout(() => {
@@ -61,6 +64,14 @@ const Main = () => {
       if (!termsAndConditionsAccepted) {
         setInfoToShow('initTerms')
       }
+    }
+  }, [user])
+
+  // Fetch notifications when user logs in
+  useEffect(() => {
+    if (user) {
+      console.log('📱 Fetching notifications for user...')
+      fetchNotifications()
     }
   }, [user])
 

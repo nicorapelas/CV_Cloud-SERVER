@@ -14,6 +14,7 @@ import {
 import LoaderFullScreen from './src/components/common/LoaderFullScreen'
 import { Provider as AuthProvider } from './src/context/AuthContext'
 import { RealTimeProvider } from './src/context/RealTimeContext'
+import { NotificationProvider } from './src/context/NotificationContext'
 import { Provider as NavProvider } from './src/context/NavContext'
 import { Provider as UniversalProvider } from './src/context/UniversalContext'
 import { Provider as AttributeProvider } from './src/context/AttributeContext'
@@ -60,8 +61,9 @@ export default function App() {
   return (
     <AuthProvider>
       <RealTimeProvider>
-        <NavProvider>
-          <ConfigProvider>
+        <NotificationProvider>
+          <NavProvider>
+            <ConfigProvider>
             <UniversalProvider>
             <BurgerMenuProvider>
               <AffiliateProvider>
@@ -105,8 +107,9 @@ export default function App() {
               </AffiliateProvider>
             </BurgerMenuProvider>
           </UniversalProvider>
-        </ConfigProvider>
-      </NavProvider>
+          </ConfigProvider>
+        </NavProvider>
+        </NotificationProvider>
       </RealTimeProvider>
     </AuthProvider>
   )
