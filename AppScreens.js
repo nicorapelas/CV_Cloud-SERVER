@@ -45,6 +45,10 @@ const AppScreens = () => {
       fetchUser()
       setFetchUserCount(fetchUserCount + 1)
     }
+    // Reset fetchUserCount when user logs out (token becomes null)
+    if (!token && fetchUserCount > 0) {
+      setFetchUserCount(0)
+    }
   }, [token, fetchUserCount, user])
 
   // Fetch system settings immediately when user is loaded
