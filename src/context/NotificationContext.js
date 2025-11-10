@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import socketService from '../services/socketService';
-import cvCloudApi from '../api/cvCloudApi';
+import ngrokApi from '../api/ngrok';
 
 // Notification reducer
 const notificationReducer = (state, action) => {
@@ -99,7 +99,7 @@ export const NotificationProvider = ({ children }) => {
   const markAsRead = async notificationId => {
     try {
       // Update server
-      await cvCloudApi.put(`/api/notifications/${notificationId}/read`);
+      await ngrokApi.put(`/api/notifications/${notificationId}/read`);
       // Update local state
       dispatch({ type: 'MARK_AS_READ', payload: notificationId });
     } catch (error) {
@@ -118,7 +118,7 @@ export const NotificationProvider = ({ children }) => {
   const removeNotification = async notificationId => {
     try {
       // Delete from server
-      await cvCloudApi.delete(`/api/notifications/${notificationId}`);
+      await ngrokApi.delete(`/api/notifications/${notificationId}`);
       // Remove from local state
       dispatch({ type: 'REMOVE_NOTIFICATION', payload: notificationId });
     } catch (error) {
@@ -132,7 +132,7 @@ export const NotificationProvider = ({ children }) => {
   const clearAllNotifications = async () => {
     try {
       // Delete all from server
-      await cvCloudApi.delete('/api/notifications');
+      await ngrokApi.delete('/api/notifications');
       // Clear local state
       dispatch({ type: 'CLEAR_ALL_NOTIFICATIONS' });
     } catch (error) {
@@ -153,7 +153,7 @@ export const NotificationProvider = ({ children }) => {
       dispatch({ type: 'SET_LOADING', payload: true });
       dispatch({ type: 'SET_ERROR', payload: null });
 
-      const response = await cvCloudApi.get('/api/notifications');
+      const response = await ngrokApi.get('/api/notifications');
 
       // Check if response.data is an array before mapping
       const notificationsData = Array.isArray(response.data)
