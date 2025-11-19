@@ -12,11 +12,11 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
 
 import { Context as FirstImpressionContext } from '../../../../../context/FirstImpressionContext'
 import { Context as UniversalContext } from '../../../../../context/UniversalContext'
+import { Context as NavContext } from '../../../../../context/NavContext'
 import VideoPlaybackUpload from './video/VideoPlaybackUpload'
 import InstructionModal from '../../../../common/modals/InstructionModal'
 import FirstImpressionPermissions from './FirstImpressionPermissions'
 import VideoSample from './video/VideoSample'
-import { log } from 'async'
 
 const FirstImpressionCreateScreen = () => {
   const [time, setTime] = useState(30)
@@ -36,6 +36,7 @@ const FirstImpressionCreateScreen = () => {
   } = useContext(FirstImpressionContext)
 
   const { toggleInstructionModal } = useContext(UniversalContext)
+  const { setCVBitScreenSelected } = useContext(NavContext)
 
   useEffect(() => {
     if (!videoObject) setView('record')
@@ -90,21 +91,13 @@ const FirstImpressionCreateScreen = () => {
 
   const audioPermissionsRequest = async () => {
     try {
-      // expo-audio may handle permissions differently
-      // For camera recording, permissions are typically handled by expo-camera
-      // when audio={true} is set on CameraView
-      if (Audio.requestPermissionsAsync) {
-        const { status } = await Audio.requestPermissionsAsync()
+      // Request microphone permissions for video recording
+      const { status } = await Camera.requestMicrophonePermissionsAsync()
         setAudioPermission(status === 'granted')
-      } else {
-        // expo-audio might not have requestPermissionsAsync
-        // In this case, expo-camera handles audio permissions
-        setAudioPermission(true)
-      }
     } catch (error) {
       console.error('Audio permission error:', error)
-      // Fallback: camera with audio enabled should handle permissions
-      setAudioPermission(true)
+      // If permission request fails, default to false so user sees permission screen
+      setAudioPermission(false)
     }
   }
 
@@ -123,10 +116,20 @@ const FirstImpressionCreateScreen = () => {
   const startRecording = async () => {
     if (cameraRef.current) {
       try {
-        const video = await cameraRef.current.recordAsync({
-          quality: '480p',
-          maxDuration: 30,
-        })
+        // Very aggressive settings for Android to reduce file size (similar to iOS ~0.8MB)
+        const recordOptions = Platform.OS === 'android' 
+          ? {
+              quality: '360p', // Lower resolution
+              videoBitrate: 800000, // 800 kbps (very low bitrate)
+              maxDuration: 30,
+            }
+          : {
+              quality: '480p',
+              maxDuration: 30,
+            }
+        
+        console.log('📹 Recording with options:', recordOptions)
+        const video = await cameraRef.current.recordAsync(recordOptions)
         addVideoObject(video)
       } catch (error) {
         console.error('Recording error:', error)
@@ -152,6 +155,15 @@ const FirstImpressionCreateScreen = () => {
             video={true}
             audio={true}
           />
+          {/* Cancel/Exit button - only show when not recording */}
+          {!recording && (
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={() => setCVBitScreenSelected('firstImpression')}
+            >
+              <Ionicons name="close" style={styles.cancelButtonIcon} />
+            </TouchableOpacity>
+          )}
           <View style={styles.cameraContainer}>
             {!runTimer ? null : (
               <>
@@ -321,6 +333,22 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     fontSize: 25,
     paddingBottom: 10,
+  },
+  cancelButton: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: 20,
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  cancelButtonIcon: {
+    color: '#ffff',
+    fontSize: 28,
   },
 })
 

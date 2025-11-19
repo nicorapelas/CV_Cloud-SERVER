@@ -10,6 +10,7 @@ import {
   Feather,
   Octicons,
 } from '@expo/vector-icons'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 import LoaderFullScreen from './src/components/common/LoaderFullScreen'
 import { Provider as AuthProvider } from './src/context/AuthContext'
@@ -59,6 +60,7 @@ export default function App() {
   const [isLoaded] = useFonts(customFonts)
   if (!isLoaded) return <LoaderFullScreen />
   return (
+    <SafeAreaProvider>
     <AuthProvider>
       <RealTimeProvider>
         <NotificationProvider>
@@ -112,5 +114,6 @@ export default function App() {
         </NotificationProvider>
       </RealTimeProvider>
     </AuthProvider>
+    </SafeAreaProvider>
   )
 }

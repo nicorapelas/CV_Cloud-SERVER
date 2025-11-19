@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { View, StyleSheet, ActivityIndicator } from 'react-native'
 import BitNoData from '../../../../common/BitNoData'
 import VideoPlayerRetake from './video/VideoPlayerRetake'
@@ -7,7 +7,12 @@ import { Context as FirstImpressionContext } from '../../../../../context/FirstI
 const FirstImpressionScreen = () => {
   const {
     state: { loading, firstImpression },
+    fetchFirstImpression,
   } = useContext(FirstImpressionContext)
+
+  useEffect(() => {
+    fetchFirstImpression()
+  }, [])
 
   const renderLoader = () => {
     return (

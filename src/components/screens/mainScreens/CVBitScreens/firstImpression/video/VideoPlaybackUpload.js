@@ -1,12 +1,16 @@
 import React, { useContext, useState, useEffect } from 'react'
-import { View, StyleSheet, TouchableOpacity, Text, Alert } from 'react-native'
 import {
-  AntDesign,
-  MaterialCommunityIcons,
-  MaterialIcons,
-} from '@expo/vector-icons'
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  Alert,
+  Platform,
+} from 'react-native'
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons'
 import { VideoView, useVideoPlayer } from 'expo-video'
-import { keys } from '../../../../../../../config/keys_dev'
+import * as FileSystem from 'expo-file-system/legacy'
+import keys from '../../../../../../../config/keys'
 
 import LoaderWithText from '../../../../../common/LoaderWithText'
 import LoaderFullScreen from '../../../../../common/LoaderFullScreen'
@@ -17,6 +21,7 @@ const VideoPlaybackUpload = ({ videoObject }) => {
   const [isPlaying, setIsPlaying] = useState(false)
   const [videoFileName, setVideoFileName] = useState(null)
   const [loaderSubText, setLoaderSubText] = useState(0)
+  const [uploadComplete, setUploadComplete] = useState(false)
 
   const {
     state: { loading, uploadSignature, videoUploading },
@@ -27,7 +32,7 @@ const VideoPlaybackUpload = ({ videoObject }) => {
     setVideoUploading,
   } = useContext(FirstImpressionContext)
 
-  const { setCVBitScreenSelected } = useContext(NavContext)
+  const { setCVBitScreenSelected, setNavTabSelected } = useContext(NavContext)
 
   const player = useVideoPlayer(
     videoObject?.uri ? { uri: videoObject.uri } : undefined
@@ -77,56 +82,150 @@ const VideoPlaybackUpload = ({ videoObject }) => {
     }
   }, [videoUploading])
 
-  const videoUpload = () => {
-    const { apiKey, signature, timestamp } = uploadSignature
-    const data = new FormData()
-    data.append('file', {
-      uri: videoObject.uri,
-      type: `video/${videoObject.uri.split('.')[1]}`,
-      name: videoFileName,
-    })
-    data.append('api_key', apiKey)
-    data.append('timestamp', timestamp)
-    data.append('signature', signature)
-    fetch(keys.cloudinary.uploadVideoUrl, {
-      method: 'post',
-      body: data,
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data) setVideoUploading(false)
-        if (data.error) {
-          setVideoUploading(false)
-          clearVideoObject()
-          setLoaderSubText(0)
-          clearUploadSignature()
-          Alert.alert('Unable to upload video, please try again later')
-          setCVBitScreenSelected('')
-          return
+  const videoUpload = async () => {
+    const {
+      apiKey,
+      signature,
+      timestamp,
+      uploadPreset,
+      eager,
+      eagerAsync,
+      folder,
+    } = uploadSignature
+
+    try {
+      let videoUri = videoObject.uri
+      let videoType = 'video/mp4' // Default to mp4
+
+      // On Android, we need to handle the file URI properly
+      if (Platform.OS === 'android') {
+        // Get file info to determine proper type
+        const fileInfo = await FileSystem.getInfoAsync(videoUri)
+
+        // Determine video type from URI
+        const uriParts = videoUri.split('.')
+        const fileExtension = uriParts[uriParts.length - 1].toLowerCase()
+
+        switch (fileExtension) {
+          case 'mp4':
+            videoType = 'video/mp4'
+            break
+          case 'mov':
+            videoType = 'video/quicktime'
+            break
+          case '3gp':
+            videoType = 'video/3gpp'
+            break
+          case 'webm':
+            videoType = 'video/webm'
+            break
+          default:
+            videoType = 'video/mp4'
         }
-        createFirstImpression(
-          {
-            videoUrl: data.url,
-            publicId: data.public_id,
-          },
-          () => {
-            setVideoUploading(false)
-            clearVideoObject()
-            setLoaderSubText(0)
-            clearUploadSignature()
-            setCVBitScreenSelected('')
-          }
-        )
+      } else {
+        // iOS
+        const extension = videoObject.uri.split('.').pop()
+        videoType = `video/${extension}`
+      }
+
+      const data = new FormData()
+
+      // IMPORTANT: Parameters must be in the same order as they appear in the signature
+      // For small videos: timestamp, upload_preset
+      // For large videos: timestamp, eager, eager_async, folder (NO upload_preset to avoid conflicts)
+      // So we send: api_key, timestamp, signature, upload_preset (if small), eager (if large), eager_async (if large), folder (if large), file
+
+      // Add metadata first (important for Cloudinary signature validation)
+      data.append('api_key', apiKey)
+      data.append('timestamp', timestamp.toString()) // Ensure it's a string
+      data.append('signature', signature)
+
+      // For small videos: add upload preset (includes incoming transformation)
+      if (uploadPreset) {
+        data.append('upload_preset', uploadPreset)
+      }
+
+      // For large videos: add eager transformations (NO preset to avoid conflicts)
+      if (eager) {
+        data.append('eager', eager)
+      }
+      if (eagerAsync === true) {
+        data.append('eager_async', 'true')
+      }
+
+      // For large videos: add folder manually (not from preset)
+      if (folder) {
+        data.append('folder', folder)
+      }
+
+      // Add file last
+      data.append('file', {
+        uri: Platform.OS === 'android' ? videoUri : videoObject.uri,
+        type: videoType,
+        name: videoFileName,
+      })
+
+      const response = await fetch(keys.cloudinary.uploadVideoUrl, {
+        method: 'POST',
+        body: data,
+        // Don't set Content-Type - React Native will set it with boundary automatically
+      })
+
+      const responseData = await response.json()
+
+      if (responseData) setVideoUploading(false)
+
+      if (responseData.error) {
         setVideoUploading(false)
         clearVideoObject()
         setLoaderSubText(0)
         clearUploadSignature()
+        Alert.alert(
+          'Unable to upload video',
+          responseData.error.message || 'Please try again later'
+        )
         setCVBitScreenSelected('')
-      })
-      .catch((err) => {
-        Alert.alert('Unable to upload video, please try again later')
-        setCVBitScreenSelected('')
-      })
+        return
+      }
+
+      // Determine video URL based on upload strategy
+      let videoUrl = responseData.secure_url || responseData.url
+
+      // For large videos: use eager transformation URL (if available)
+      if (responseData.eager && responseData.eager.length > 0) {
+        const eagerItem = responseData.eager[0]
+        // Use secure_url from eager item (includes version and .mov extension)
+        // Cloudinary provides this URL even when status is "processing"
+        videoUrl = eagerItem.secure_url || eagerItem.url
+      }
+
+      createFirstImpression(
+        {
+          videoUrl: videoUrl,
+          publicId: responseData.public_id,
+        },
+        () => {
+          setVideoUploading(false)
+          clearVideoObject()
+          setLoaderSubText(0)
+          clearUploadSignature()
+          setUploadComplete(true)
+          // Navigate to Dashboard after successful upload
+          setCVBitScreenSelected('') // Clear first impression screen
+          setNavTabSelected('dashboard') // Navigate to Dashboard
+        }
+      )
+    } catch (err) {
+      setVideoUploading(false)
+      clearVideoObject()
+      setLoaderSubText(0)
+      clearUploadSignature()
+      Alert.alert(
+        'Unable to upload video',
+        'Please check your internet connection and try again'
+      )
+      setCVBitScreenSelected('')
+    }
   }
 
   const renderLoaderSubText = () => {
@@ -179,13 +278,49 @@ const VideoPlaybackUpload = ({ videoObject }) => {
               style={styles.deleteButtonIcon}
             />
           </TouchableOpacity>
+          {uploadComplete && (
+            <TouchableOpacity
+              style={styles.doneButton}
+              onPress={() => setCVBitScreenSelected('')}
+            >
+              <Text style={styles.doneButtonText}>done</Text>
+            </TouchableOpacity>
+          )}
         </View>
-        <TouchableOpacity
-          onPress={() => createUploadSignature()}
-          style={styles.uploadButton}
-        >
-          <Text style={styles.uploadButtonText}>upload video</Text>
-        </TouchableOpacity>
+        {!videoUploading && !uploadComplete && (
+          <TouchableOpacity
+            onPress={async () => {
+              // Pause video when upload starts
+              if (player && isPlaying) {
+                player.pause()
+              }
+
+              // Check video size to determine upload strategy
+              // Large videos need eager transformations with async (can't use incoming transformation)
+              const LARGE_VIDEO_THRESHOLD = 10 * 1024 * 1024 // 10MB
+              let useEagerAsync = false
+
+              if (Platform.OS === 'android' && videoObject?.uri) {
+                try {
+                  const fileInfo = await FileSystem.getInfoAsync(
+                    videoObject.uri
+                  )
+                  if (fileInfo?.size) {
+                    if (fileInfo.size > LARGE_VIDEO_THRESHOLD) {
+                      useEagerAsync = true
+                    }
+                  }
+                } catch (error) {
+                  // Error checking file size
+                }
+              }
+              await createUploadSignature(useEagerAsync)
+            }}
+            style={styles.uploadButton}
+          >
+            <Text style={styles.uploadButtonText}>upload video</Text>
+          </TouchableOpacity>
+        )}
       </View>
     )
   }
@@ -236,6 +371,18 @@ const styles = StyleSheet.create({
   uploadButtonText: {
     color: '#ffff',
     padding: 15,
+  },
+  doneButton: {
+    marginLeft: 25,
+    borderColor: '#ffff',
+    borderWidth: 1,
+    borderRadius: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  doneButtonText: {
+    color: '#ffff',
+    fontSize: 14,
   },
 })
 

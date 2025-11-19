@@ -18,11 +18,26 @@ const FirstImpressionReducer = (state, action) => {
     case 'FETCH':
       return { ...state, firstImpression: action.payload, loading: false }
     case 'CREATE':
-      return { ...state, firstImpression: action.payload, firstImpressionStatusInitFetchDone: false, loading: false }
+      return {
+        ...state,
+        firstImpression: action.payload,
+        firstImpressionStatusInitFetchDone: false,
+        loading: false,
+      }
     case 'EDIT':
-      return { ...state, [action.payload._id]: action.payload, firstImpressionStatusInitFetchDone: false, loading: false }
+      return {
+        ...state,
+        [action.payload._id]: action.payload,
+        firstImpressionStatusInitFetchDone: false,
+        loading: false,
+      }
     case 'DELETE':
-      return { ...state, firstImpression: action.payload, firstImpressionStatusInitFetchDone: false, loading: false }
+      return {
+        ...state,
+        firstImpression: action.payload,
+        firstImpressionStatusInitFetchDone: false,
+        loading: false,
+      }
     case 'ADD_VIDEO_OBJECT':
       return { ...state, videoObject: action.payload }
     case 'CLEAR_VIDEO_OBJECT':
@@ -65,33 +80,47 @@ const fetchFirstImpression = (dispatch) => async () => {
   }
 }
 
-const createUploadSignature = (dispatch) => async () => {
-  dispatch({ type: 'LOADING' })
-  try {
-    const response = await ngrokApi.post(
-      '/api/cloudinary/signature-request-no-preset'
-    )
-    if (response.data.error) {
-      dispatch({ type: 'ADD_ERROR', payload: response.data.error })
+const createUploadSignature =
+  (dispatch) =>
+  async (useEagerAsync = false) => {
+    dispatch({ type: 'LOADING' })
+    try {
+      const response = await ngrokApi.post(
+        '/api/cloudinary/signature-request-no-preset',
+        { useEagerAsync }
+      )
+      if (response.data.error) {
+        dispatch({ type: 'ADD_ERROR', payload: response.data.error })
+        return
+      }
+      console.log('🔐 Signature response received:', {
+        uploadPreset: response.data.uploadPreset,
+        eager: response.data.eager,
+        eagerAsync: response.data.eagerAsync,
+        folder: response.data.folder,
+        hasSignature: !!response.data.signature,
+      })
+      dispatch({ type: 'ADD_UPLOAD_SIGNATURE', payload: response.data })
+      return
+    } catch (error) {
+      await ngrokApi.post('/error', { error: error })
       return
     }
-    dispatch({ type: 'ADD_UPLOAD_SIGNATURE', payload: response.data })
-    return
-  } catch (error) {
-    await ngrokApi.post('/error', { error: error })
-    return
   }
-}
 
 const clearUploadSignature = (dispatch) => () => {
   dispatch({ type: 'CLEAR_UPLOAD_SIGNATURE', payload: null })
 }
 
-const createFirstImpression = (dispatch) => async (videoData) => {
+const createFirstImpression = (dispatch) => async (videoData, callback) => {
   dispatch({ type: 'LOADING' })
   try {
     const response = await ngrokApi.post('/api/first-impression', videoData)
     dispatch({ type: 'CREATE', payload: response.data })
+    // Call callback if provided (for navigation, cleanup, etc.)
+    if (callback && typeof callback === 'function') {
+      callback()
+    }
     return
   } catch (error) {
     await ngrokApi.post('/error', { error: error })
@@ -149,9 +178,11 @@ const setVideoUploading = (dispatch) => (value) => {
 }
 
 const setFirstImpressionStatusInitFetchDone = (dispatch) => (value) => {
-  dispatch({ type: 'SET_FIRST_IMPRESSION_STATUS_INIT_FETCH_DONE', payload: value })
+  dispatch({
+    type: 'SET_FIRST_IMPRESSION_STATUS_INIT_FETCH_DONE',
+    payload: value,
+  })
 }
-
 
 export const { Context, Provider } = createDataContext(
   FirstImpressionReducer,

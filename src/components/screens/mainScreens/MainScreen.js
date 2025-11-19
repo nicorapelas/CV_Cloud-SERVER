@@ -1,12 +1,13 @@
 import React, { useState, useContext, useEffect, useRef } from 'react'
 import { View, StyleSheet, Platform } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import InfoFullscreenRender from '../../common/InfoFullscreenRender'
 import Header from '../../common/Header'
 import HeaderCVBit from '../../common/HeaderCVBit'
 import NavBar from '../../common/navbar/NavBar'
 import Menu from '../../common/menu/Menu'
-import BannerAdFullRender from '../../../advertisements/bannerAdsFull/BannerAdFullRender'
+// import BannerAdFullRender from '../../../advertisements/bannerAdsFull/BannerAdFullRender'
 import LoaderFullScreen from '../../common/LoaderFullScreen'
 import { Context as BurgerMenuContext } from '../../../context/BurgerMenuContext'
 import { Context as AuthContext } from '../../../context/AuthContext'
@@ -20,6 +21,7 @@ const Main = () => {
   const [showHeader, setShowHeader] = useState(true)
   const [showFullAdPopup, setShowFullAdPopup] = useState(false)
   const adTimerRef = useRef(null)
+  const insets = useSafeAreaInsets()
 
   const {
     state: { user },
@@ -132,6 +134,8 @@ const Main = () => {
       CVBitScreenSelected === 'certificatePdfUpload' ||
       CVBitScreenSelected === 'certificateCreate' ||
       CVBitScreenSelected === 'certificateEdit' ||
+      CVBitScreenSelected === 'firstImpressionCreate' ||
+      CVBitScreenSelected === 'firstImpressionEdit' ||
       navTabSelected === 'viewCV' ||
       imageToViewUrl ||
       videoUploading
@@ -161,10 +165,16 @@ const Main = () => {
   const renderContent = () => {
     if (!user) return <LoaderFullScreen />
     // Show full banner ad popup (separate from database setting)
-    if (showFullAdPopup) return <BannerAdFullRender />
+    // if (showFullAdPopup) return <BannerAdFullRender />
     if (InfoToShow !== '') return <InfoFullscreenRender />
+
+    // Check if user is on First Impression screen (likely recording)
+    const isOnFirstImpressionScreen =
+      CVBitScreenSelected === 'firstImpressionCreate' ||
+      CVBitScreenSelected === 'firstImpressionEdit'
+
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { marginBottom: insets.bottom + 5 }]}>
         <View
           style={
             showHeader ? styles.headerContainer : styles.headerContainerMinimal
@@ -177,7 +187,10 @@ const Main = () => {
           <Menu />
         </View>
         <View style={styles.navBarContainer}>
-          <NavBar />
+          <NavBar
+            videoUploading={videoUploading}
+            isRecording={isOnFirstImpressionScreen}
+          />
         </View>
       </View>
     )
